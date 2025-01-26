@@ -1,11 +1,14 @@
-# React + Vite
+# Finance Dashboard
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## Setup
 
-Currently, two official plugins are available:
+- `npm run dev` to run react app
+- `json-server --watch db.json --port 5000` to host db locally
+- foward port 5173 using vscode
+- foward port 5000 using ngrok
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
-# finance-dashboard
-# finance-dashboard
-# finance-dashboard
+and we're good to go
+
+### N/B: This is just a temporary thingy till I set up firebase/supabase (I'm still deciding)
+
+make sure to change server proxy links when refowarding with ngrok
