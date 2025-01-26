@@ -1,0 +1,12 @@
+@use "./styles/prestyles";
+// @import "./styles/dark";
+@use "./styles/light";
+
+table {
+    gap: 0;
+    border-collapse: collapse;
+    td,
+    th {
+      padding: 1rem;
+    }
+  }

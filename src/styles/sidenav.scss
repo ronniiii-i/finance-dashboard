@@ -1,0 +1,91 @@
+#sidenav {
+  width: 23rem;
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  border-right: 1px solid #E5E7EB;
+  // padding: 2vw 1vw;
+  .user{
+    padding-block: 1rem;
+    .user-info{
+      gap: 7px;
+      .avatar{
+        width: 2.5rem;
+        height: 2.5rem;
+        overflow: hidden;
+        border-radius: 100%;
+      }
+      .details{
+
+      }
+    }
+    div{
+      position: relative;
+      .menu{
+        position: absolute;
+        width: 100px;
+        margin-top: 10px;
+        top: -100%;
+        right: 0;
+        background-color: #F9FAFB;
+        box-shadow: 0px 0px 5px 0px #D1D5DB;
+        display: none;
+        &.show{
+          display: block;
+        }
+        a{
+          padding: 1rem;
+        }
+      }
+    }
+  }
+  .search{
+    border: 1px solid #D1D5DB;
+    padding: 8px 10px;
+    border-radius: 10px;
+    margin-block: 1rem;
+    gap: 5px;
+    svg{
+      width: 25px;
+      height: 25px;
+      fill: #D1D5DB;
+    }
+    input{
+      border: none;
+      width: 100%;
+    }
+  }
+  nav {
+    ul {
+      li {
+        border-bottom: 2px solid transparent;
+        margin-block: .7rem;
+        padding: 0 10px;
+        a {
+          padding: 0.5rem 0;
+          font-weight: 500;
+          color: #374151;
+          gap: 3px;
+          svg{
+            width: 1.5rem;
+            height: 1.5rem;
+            margin-top: 3px;
+          }
+        }
+        &:hover {
+          background-color: #F9FAFB;
+            cursor: pointer;
+          a {
+            text-decoration: none;
+          }
+        }
+      }
+    }
+  }
+  button {
+    margin: 2vw auto;
+    // position: absolute;
+    bottom: 0;
+    width: 100%;
+  }
+}
