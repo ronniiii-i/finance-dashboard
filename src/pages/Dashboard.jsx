@@ -241,7 +241,8 @@ function Dashboard() {
               </p>
             </div>
           </div>
-          <div className="chart flex align-center justify-center">
+          <div className="chart">
+          <IncomeExpenseChart transactions={transactions} />
             {/* <div className="chart-container" style={{ margin: "20px 0" }}>
           <IncomeExpenseChart />
         </div>

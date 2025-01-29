@@ -1,47 +1,93 @@
-// components/IncomeExpenseChart.jsx
-import React from "react";
-import { Line } from "react-chartjs-2";
-import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from "chart.js";
+import { useState, useEffect } from "react";
+import { AreaChart, Area, XAxis, YAxis, Tooltip, Legend, ResponsiveContainer } from "recharts";
+import moment from "moment";
 
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend);
+const IncomeExpenseChart = ({ transactions }) => {
+  const [filteredData, setFilteredData] = useState([]);
+  const [timeline, setTimeline] = useState("1w");
 
-const IncomeExpenseChart = () => {
-  const data = {
-    labels: ["January", "February", "March", "April"],
-    datasets: [
-      {
-        label: "Income",
-        data: [5000, 4500, 6000, 7000],
-        borderColor: "rgba(75, 192, 192, 1)",
-        backgroundColor: "rgba(75, 192, 192, 0.2)",
-        tension: 0.3, // Smoother curves
-        pointRadius: 5,
-        pointBackgroundColor: "rgba(75, 192, 192, 1)",
-      },
-      {
-        label: "Expenses",
-        data: [2000, 2500, 3000, 4000],
-        borderColor: "rgba(255, 99, 132, 1)",
-        backgroundColor: "rgba(255, 99, 132, 0.2)",
-        tension: 0.3,
-        pointRadius: 5,
-        pointBackgroundColor: "rgba(255, 99, 132, 1)",
-      },
-    ],
+  useEffect(() => {
+    filterData();
+  }, [transactions, timeline]);
+
+  const filterData = () => {
+    const now = moment();
+    let startDate;
+    let interval;
+    let format;
+
+    switch (timeline) {
+      case "1w":
+        startDate = now.clone().subtract(1, "weeks");
+        interval = "day";
+        format = "ddd DD";
+        break;
+      case "1m":
+        startDate = now.clone().subtract(1, "months");
+        interval = "7d";
+        format = "MMM DD";
+        break;
+      case "3m":
+        startDate = now.clone().subtract(3, "months");
+        interval = "2w";
+        format = now.year() !== startDate.year() ? "DD-MMM-YYYY" : "MMM DD";
+        break;
+      case "6m":
+      case "1y":
+      case "all":
+        startDate = now.clone().subtract(timeline === "6m" ? 6 : timeline === "1y" ? 12 : 100, "months");
+        interval = "month";
+        format = now.year() !== startDate.year() ? "MMM-YYYY" : "MMM";
+        break;
+      default:
+        return;
+    }
+
+    const filtered = transactions
+      .filter((t) => moment(t.date).isBetween(startDate, now, undefined, "[]"))
+      .sort((a, b) => new Date(a.date) - new Date(b.date));
+
+    const groupedData = {};
+
+    filtered.forEach((t) => {
+      const dateKey = moment(t.date).format(format);
+      if (!groupedData[dateKey]) {
+        groupedData[dateKey] = { date: dateKey, income: 0, expense: 0 };
+      }
+      if (t.type === "income") {
+        groupedData[dateKey].income += t.amount;
+      } else {
+        groupedData[dateKey].expense += t.amount;
+      }
+    });
+
+    setFilteredData(Object.values(groupedData));
   };
 
-  const options = {
-    responsive: true,
-    plugins: {
-      legend: { position: "top" },
-      title: { display: true, text: "Income vs Expenses (Line Graph)" },
-    },
-    scales: {
-      y: { beginAtZero: true },
-    },
-  };
-
-  return <Line data={data} options={options} />;
+  return (
+    <div  className="chart-container">
+    <div className="filter-container">
+      <select className="filter-select" onChange={(e) => setTimeline(e.target.value)} value={timeline}>
+        <option value="1w">Last Week</option>
+        <option value="1m">Last Month</option>
+        <option value="3m">Last 3 Months</option>
+        <option value="6m">Last 6 Months</option>
+        <option value="1y">Last Year</option>
+        <option value="all">All Time</option>
+      </select>
+    </div>
+      <ResponsiveContainer className="full-width" height={300}>
+        <AreaChart data={filteredData}>
+          <XAxis dataKey="date" tick={{ fontSize: 12 }} />
+          <YAxis />
+          <Tooltip />
+          <Legend />
+          <Area type="monotone" dataKey="income" stroke="#82ca9d" fill="#82ca9d80" />
+          <Area type="monotone" dataKey="expense" stroke="#ff4d4d" fill="#ff4d4d80" />
+        </AreaChart>
+      </ResponsiveContainer>
+    </div>
+  );
 };
 
 export default IncomeExpenseChart;
