@@ -10,8 +10,13 @@
 }
 .top + div {
   padding-block: 2rem;
+  gap: 1rem;
   .w-4 {
     width: 70%;
+    // display: none;
+  }
+  .w-1{
+    width: 30%;
   }
 }
 .balances {
@@ -143,5 +148,40 @@
         font-size: 1.2rem;
       }
     }
+  }
+}
+.pie{
+  padding: 1vw;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  border: 1px solid #e5e7eb;
+  border-radius: 1rem;
+  h5,p{
+    width: 100%;
+    text-align: left;
+    padding: .25rem .5rem;
+  }
+  h5{
+    font-size: 1rem;
+  }
+  p{
+    font-size: .8rem;
+  }
+  .filter-container{
+    padding-block: .5rem;
+    // margin-top: .5rem;
+    .filter-select {
+      padding: 0.5rem 1rem;
+      background-color: white;
+      border: 1px solid #e5e7eb;
+      cursor: pointer;
+      &:hover {
+        background-color: #f9fafb;
+      }
+    }
+  }
+  svg {
+    max-width: 100%;
   }
 }

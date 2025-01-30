@@ -12,7 +12,7 @@ import {
 
 import Transactions from "../components/Transactions";
 import IncomeExpenseChart from "../components/IncomeExpenseChart";
-import SpendingPieChart from "../components/SpendingPieChart";
+import SpendingCategoryPieChart from "../components/SpendingPieChart";
 
 import "../styles/dashboard.scss";
 
@@ -24,29 +24,41 @@ function Dashboard() {
   const [currentPage, setCurrentPage] = useState(1);
   const [transactionsPerPage] = useState(5);
   const [showFilter, setShowFilter] = useState(false);
+  const timeRangeOptions = [
+    { value: "7days", label: "Last 7 Days" },
+    { value: "14days", label: "Last 2 Weeks" },
+    { value: "1month", label: "Last Month" },
+    { value: "3months", label: "Last 3 Months" },
+  ];
 
   useEffect(() => {
     const fetchUser = async () => {
-      const res = await fetch("https://api.npoint.io/f06685e7b9e1b0776d0b/name", {
-        headers: {
-          "User-Agent": "CustomUserAgent", // Custom user-agent to bypass the warning
-          "Content-Type": "application/json",
-          "ngrok-skip-browser-warning": "true", // You can include both headers
-        },
-      });
+      const res = await fetch(
+        "https://api.npoint.io/f06685e7b9e1b0776d0b/name",
+        {
+          headers: {
+            "User-Agent": "CustomUserAgent", // Custom user-agent to bypass the warning
+            "Content-Type": "application/json",
+            "ngrok-skip-browser-warning": "true", // You can include both headers
+          },
+        }
+      );
       const data = await res.json();
 
       setUser(data);
     };
 
     const fetchTransactions = async () => {
-      const res = await fetch("https://api.npoint.io/f06685e7b9e1b0776d0b/transactions", {
-        headers: {
-          "User-Agent": "CustomUserAgent", // Custom user-agent to bypass the warning
-          "Content-Type": "application/json",
-          "ngrok-skip-browser-warning": "true", // You can include both headers
-        },
-      });
+      const res = await fetch(
+        "https://api.npoint.io/f06685e7b9e1b0776d0b/transactions",
+        {
+          headers: {
+            "User-Agent": "CustomUserAgent", // Custom user-agent to bypass the warning
+            "Content-Type": "application/json",
+            "ngrok-skip-browser-warning": "true", // You can include both headers
+          },
+        }
+      );
       const data = await res.json();
 
       const sortedData = data.sort(
@@ -58,13 +70,16 @@ function Dashboard() {
     };
 
     const fetchCategories = async () => {
-      const res = await fetch("https://api.npoint.io/f06685e7b9e1b0776d0b/categories", {
-        headers: {
-          "User-Agent": "CustomUserAgent", // Custom user-agent to bypass the warning
-          "Content-Type": "application/json",
-          "ngrok-skip-browser-warning": "true", // You can include both headers
-        },
-      });
+      const res = await fetch(
+        "https://api.npoint.io/f06685e7b9e1b0776d0b/categories",
+        {
+          headers: {
+            "User-Agent": "CustomUserAgent", // Custom user-agent to bypass the warning
+            "Content-Type": "application/json",
+            "ngrok-skip-browser-warning": "true", // You can include both headers
+          },
+        }
+      );
       const data = await res.json();
       setCategories(data);
     };
@@ -240,13 +255,7 @@ function Dashboard() {
             </div>
           </div>
           <div className="chart">
-          <IncomeExpenseChart transactions={transactions} />
-            {/* <div className="chart-container" style={{ margin: "20px 0" }}>
-          <IncomeExpenseChart />
-        </div>
-        <div className="chart-container" style={{ margin: "20px 0" }}>
-          <SpendingPieChart />
-        </div> */}
+            <IncomeExpenseChart transactions={transactions} />
           </div>
           <div className="recent">
             <div className="top flex align-center justify-between">
@@ -292,7 +301,13 @@ function Dashboard() {
             </div>
           </div>
         </div>
-        <div className="w-1"></div>
+        <div className="w-1">
+          <SpendingCategoryPieChart
+            transactions={transactions}
+            categories={categories}
+            timeRangeOptions={timeRangeOptions}
+          />
+        </div>
       </div>
     </section>
   );
