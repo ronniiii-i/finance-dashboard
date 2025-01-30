@@ -16,8 +16,6 @@ import SpendingPieChart from "../components/SpendingPieChart";
 
 import "../styles/dashboard.scss";
 
-import React from "react";
-
 function Dashboard() {
   const [user, setUser] = useState([]);
   const [transactions, setTransactions] = useState([]);
@@ -29,7 +27,7 @@ function Dashboard() {
 
   useEffect(() => {
     const fetchUser = async () => {
-      const res = await fetch("/name", {
+      const res = await fetch("https://api.npoint.io/f06685e7b9e1b0776d0b/name", {
         headers: {
           "User-Agent": "CustomUserAgent", // Custom user-agent to bypass the warning
           "Content-Type": "application/json",
@@ -42,7 +40,7 @@ function Dashboard() {
     };
 
     const fetchTransactions = async () => {
-      const res = await fetch("/transactions", {
+      const res = await fetch("https://api.npoint.io/f06685e7b9e1b0776d0b/transactions", {
         headers: {
           "User-Agent": "CustomUserAgent", // Custom user-agent to bypass the warning
           "Content-Type": "application/json",
@@ -60,7 +58,7 @@ function Dashboard() {
     };
 
     const fetchCategories = async () => {
-      const res = await fetch("/categories", {
+      const res = await fetch("https://api.npoint.io/f06685e7b9e1b0776d0b/categories", {
         headers: {
           "User-Agent": "CustomUserAgent", // Custom user-agent to bypass the warning
           "Content-Type": "application/json",
