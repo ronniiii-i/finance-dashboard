@@ -13,6 +13,8 @@ import {
 import Transactions from "../components/Transactions";
 import IncomeExpenseChart from "../components/IncomeExpenseChart";
 import SpendingCategoryPieChart from "../components/SpendingPieChart";
+import BudgetGauge from "../components/BudgetGauge";
+import BudgetBreakdown from "../components/BudgetBreakdown";
 
 import "../styles/dashboard.scss";
 
@@ -155,6 +157,14 @@ function Dashboard() {
     setFilteredTransactions(transactions);
     setShowFilter(false); // Close the filter dropdown
   };
+
+  const totalBudget = 5000; // Example total budget
+  const totalSpent = 4200; // Example total spending
+  const categoryExpenses = [
+    { name: "Food", amount: 1000, budget: 1200},
+    { name: "Transportation", amount: 800, budget: 1000 },
+    { name: "Entertainment", amount: 200, budget: 500 },
+  ]; // Example category expenses
 
   return (
     <section className="full-width">
@@ -306,6 +316,11 @@ function Dashboard() {
             transactions={transactions}
             categories={categories}
             timeRangeOptions={timeRangeOptions}
+          />
+          <BudgetGauge budget={totalBudget} spent={totalSpent} />
+          <BudgetBreakdown
+            categoryData={categoryExpenses}
+            categories={categories}
           />
         </div>
       </div>
