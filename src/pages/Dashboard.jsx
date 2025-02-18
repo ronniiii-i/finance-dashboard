@@ -17,6 +17,9 @@ import BudgetGauge from "../components/BudgetGauge";
 import BudgetBreakdown from "../components/BudgetBreakdown";
 import NewTransactionForm from "../components/NewTransactionForm";
 
+import { exportCSV } from "../utils/exportCSV";
+import { exportPDF } from "../utils/exportPDF";
+
 import "../styles/dashboard.scss";
 
 function Dashboard({ supabaseUrl, supabaseApiKey }) {
@@ -151,6 +154,12 @@ function Dashboard({ supabaseUrl, supabaseApiKey }) {
   const monthlyExpense = calculateMonthlyExpense(currentMonth);
   const balance = calculateBalance(monthlyIncome, monthlyExpense);
 
+  const summary = {
+    income: monthlyIncome,
+    expense: monthlyExpense,
+    balance,
+  };
+
   // Calculate the previous month's income, expense, and balance
   const lastMonthIncome = calculateMonthlyIncome(previousMonth);
   const lastMonthExpense = calculateMonthlyExpense(previousMonth);
@@ -175,6 +184,14 @@ function Dashboard({ supabaseUrl, supabaseApiKey }) {
     { name: "Entertainment", amount: 200, budget: 500 },
   ]; // Example category expenses
 
+  const handleExportCSV = () => {
+    exportCSV({ mode: "dashboard", summary, recentTransactions });
+  };
+
+  const handleExportPDF = () => {
+    exportPDF({ mode: "dashboard", summary, recentTransactions });
+  };
+
   return (
     <section className="full-width">
       <div className="top flex justify-between">
@@ -192,6 +209,8 @@ function Dashboard({ supabaseUrl, supabaseApiKey }) {
           >
             <IoMdAdd /> Add Entry
           </button>
+          <button onClick={handleExportCSV}>Export CSV</button>
+          <button onClick={handleExportPDF}>Export PDF</button>
         </div>
       </div>
       <div className="flex full-width">
@@ -300,8 +319,7 @@ function Dashboard({ supabaseUrl, supabaseApiKey }) {
             <div className="pagination flex justify-between align-center">
               <p>
                 Showing {indexOfFirstTransaction + 1} to{" "}
-                {indexOfLastTransaction} of {recentTransactions.length}{" "}
-                results
+                {indexOfLastTransaction} of {recentTransactions.length} results
               </p>
               <div className="buttons flex align-center">
                 <button
