@@ -109,7 +109,8 @@ function Dashboard({ supabaseUrl, supabaseApiKey }) {
 
   const indexOfLastTransaction = currentPage * transactionsPerPage;
   const indexOfFirstTransaction = indexOfLastTransaction - transactionsPerPage;
-  const currentTransactions = filteredTransactions.slice(
+  const recentTransactions = filteredTransactions.slice(0, 30);
+  const currentTransactions = recentTransactions.slice(
     indexOfFirstTransaction,
     indexOfLastTransaction
   );
@@ -299,7 +300,7 @@ function Dashboard({ supabaseUrl, supabaseApiKey }) {
             <div className="pagination flex justify-between align-center">
               <p>
                 Showing {indexOfFirstTransaction + 1} to{" "}
-                {indexOfLastTransaction} of {filteredTransactions.length}{" "}
+                {indexOfLastTransaction} of {recentTransactions.length}{" "}
                 results
               </p>
               <div className="buttons flex align-center">
@@ -313,7 +314,7 @@ function Dashboard({ supabaseUrl, supabaseApiKey }) {
                   onClick={() => paginate(currentPage + 1)}
                   disabled={
                     currentPage ===
-                    Math.ceil(filteredTransactions.length / transactionsPerPage)
+                    Math.ceil(recentTransactions.length / transactionsPerPage)
                   }
                 >
                   <IoChevronForwardOutline />
