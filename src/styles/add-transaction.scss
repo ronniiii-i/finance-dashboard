@@ -1,6 +1,6 @@
-#transactions{
-    position: relative;
-     min-height: 100vh;
+#transactions {
+  position: relative;
+  min-height: 100vh;
 }
 .module {
   position: absolute;
@@ -35,29 +35,29 @@
   transform: scale(0) translate(0%, 0%);
 }
 
-form {
-  gap: 1rem;
-  max-width: 400px;
-  margin: 2rem auto;
-  // border: 1px solid black;
-  padding: 1vw;
-  input,
-  select {
-    width: 100%;
-    padding: 0.5rem;
-    border-radius: 0;
-    margin: auto 1rem;
-    border: 1px solid #d3c1d6ff;
-  }
-}
+// form {
+//   gap: 1rem;
+//   max-width: 400px;
+//   margin: 2rem auto;
+//   // border: 1px solid black;
+//   padding: 1vw;
+//   input,
+//   select {
+//     width: 100%;
+//     padding: 0.5rem;
+//     border-radius: 0;
+//     margin: auto 1rem;
+//     border: 1px solid #d3c1d6ff;
+//   }
+// }
 
-.button-secondary.flex{
-    max-width: 250px;
-    gap: .5rem;
-    h3{
-        color: #d3c1d6ff;
-    }
-    &:hover h3{
-        color: #290a30ff
-    }
+.button-secondary.flex {
+  max-width: 250px;
+  gap: 0.5rem;
+  h3 {
+    color: #d3c1d6ff;
+  }
+  &:hover h3 {
+    color: #290a30ff;
+  }
 }

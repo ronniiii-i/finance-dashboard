@@ -15,10 +15,12 @@ import IncomeExpenseChart from "../components/IncomeExpenseChart";
 import SpendingCategoryPieChart from "../components/SpendingPieChart";
 import BudgetGauge from "../components/BudgetGauge";
 import BudgetBreakdown from "../components/BudgetBreakdown";
+import NewTransactionForm from "../components/NewTransactionForm";
 
 import "../styles/dashboard.scss";
 
-function Dashboard() {
+function Dashboard({ supabaseUrl, supabaseApiKey }) {
+  const [popup, setPopup] = useState(false);
   const [user, setUser] = useState([]);
   const [transactions, setTransactions] = useState([]);
   const [categories, setCategories] = useState([]);
@@ -35,32 +37,43 @@ function Dashboard() {
 
   useEffect(() => {
     const fetchUser = async () => {
-      const res = await fetch(
-        "https://api.npoint.io/f06685e7b9e1b0776d0b/name",
-        {
-          headers: {
-            "User-Agent": "CustomUserAgent", // Custom user-agent to bypass the warning
-            "Content-Type": "application/json",
-            "ngrok-skip-browser-warning": "true", // You can include both headers
-          },
-        }
-      );
-      const data = await res.json();
+      try {
+        const res = await fetch(
+          `${supabaseUrl}/rest/v1/users?select=*`, // Replace 'users' with your table name
+          {
+            headers: {
+              apikey: supabaseApiKey, // Replace with your Supabase API key
+              Authorization: `Bearer ${supabaseApiKey}`, // Replace with your Supabase API key
+              "Content-Type": "application/json",
+            },
+          }
+        );
 
-      setUser(data);
+        if (!res.ok) {
+          throw new Error(`Failed to fetch user: ${res.statusText}`);
+        }
+
+        const data = await res.json();
+
+        // Assuming the response is an array of users and you want the first user
+        if (data.length > 0) {
+          setUser(data[0]); // Set the first user in the array
+        } else {
+          console.error("No user found");
+        }
+      } catch (error) {
+        console.error("Error fetching user:", error);
+      }
     };
 
     const fetchTransactions = async () => {
-      const res = await fetch(
-        "https://api.npoint.io/f06685e7b9e1b0776d0b/transactions",
-        {
-          headers: {
-            "User-Agent": "CustomUserAgent", // Custom user-agent to bypass the warning
-            "Content-Type": "application/json",
-            "ngrok-skip-browser-warning": "true", // You can include both headers
-          },
-        }
-      );
+      const res = await fetch(`${supabaseUrl}/rest/v1/transactions?select=*`, {
+        headers: {
+          apikey: supabaseApiKey, // Replace with your Supabase API key
+          Authorization: `Bearer ${supabaseApiKey}`, // Replace with your Supabase API key
+          "Content-Type": "application/json",
+        },
+      });
       const data = await res.json();
 
       const sortedData = data.sort(
@@ -72,16 +85,13 @@ function Dashboard() {
     };
 
     const fetchCategories = async () => {
-      const res = await fetch(
-        "https://api.npoint.io/f06685e7b9e1b0776d0b/categories",
-        {
-          headers: {
-            "User-Agent": "CustomUserAgent", // Custom user-agent to bypass the warning
-            "Content-Type": "application/json",
-            "ngrok-skip-browser-warning": "true", // You can include both headers
-          },
-        }
-      );
+      const res = await fetch(`${supabaseUrl}/rest/v1/categories?select=*`, {
+        headers: {
+          apikey: supabaseApiKey, // Replace with your Supabase API key
+          Authorization: `Bearer ${supabaseApiKey}`, // Replace with your Supabase API key
+          "Content-Type": "application/json",
+        },
+      });
       const data = await res.json();
       setCategories(data);
     };
@@ -161,7 +171,7 @@ function Dashboard() {
   const totalBudget = 5000; // Example total budget
   const totalSpent = 4200; // Example total spending
   const categoryExpenses = [
-    { name: "Food", amount: 1000, budget: 1200},
+    { name: "Food", amount: 1000, budget: 1200 },
     { name: "Transportation", amount: 800, budget: 1000 },
     { name: "Entertainment", amount: 200, budget: 500 },
   ]; // Example category expenses
@@ -177,7 +187,10 @@ function Dashboard() {
           <button className="flex align-center justify-center">
             <CiExport /> Export
           </button>
-          <button className="flex align-center justify-center secondary">
+          <button
+            className="flex align-center justify-center secondary"
+            onClick={() => setPopup(true)}
+          >
             <IoMdAdd /> Add Entry
           </button>
         </div>
@@ -324,6 +337,12 @@ function Dashboard() {
           />
         </div>
       </div>
+      {/* Popup */}
+      <NewTransactionForm
+        categories={categories}
+        popup={popup}
+        setPopup={setPopup}
+      />
     </section>
   );
 }

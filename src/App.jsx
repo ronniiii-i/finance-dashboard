@@ -4,6 +4,8 @@ import Dashboard from "./pages/Dashboard";
 import Transaction from "./pages/Transaction";
 import Reports from "./pages/Reports";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+const supabaseUrl = process.env.VITE_SUPABASE_URL;
+const supabaseApiKey = process.env.VITE_SUPABASE_API_KEY;
 
 function App() {
   return (
@@ -13,7 +15,15 @@ function App() {
         <main className="full-width">
           <Routes>
             <Route path="/" element={<Dashboard />} />
-            <Route path="/dashboard" element={<Dashboard />} />
+            <Route
+              path="/dashboard"
+              element={
+                <Dashboard
+                  supabaseUrl={supabaseUrl}
+                  supabaseApiKey={supabaseApiKey}
+                />
+              }
+            />
             <Route path="/transactions" element={<Transaction />} />
             <Route path="/reports" element={<Reports />} />
           </Routes>

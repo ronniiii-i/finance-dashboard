@@ -1,7 +1,7 @@
 import { useState } from "react";
 
 import Transactions from "../components/Transactions";
-import "../styles/add-transaction.scss";
+// import "../styles/add-transaction.scss";
 
 function Transaction() {
   const [popup, setPopup] = useState(false);
