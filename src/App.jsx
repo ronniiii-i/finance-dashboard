@@ -4,8 +4,8 @@ import Dashboard from "./pages/Dashboard";
 import Transaction from "./pages/Transaction";
 import Reports from "./pages/Reports";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
-const supabaseUrl = process.env.VITE_SUPABASE_URL;
-const supabaseApiKey = process.env.VITE_SUPABASE_API_KEY;
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseApiKey = process.env.SUPABASE_API_KEY;
 
 function App() {
   return (
