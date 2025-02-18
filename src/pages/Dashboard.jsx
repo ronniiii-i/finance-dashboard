@@ -35,6 +35,22 @@ function Dashboard({ supabaseUrl, supabaseApiKey }) {
     { value: "3months", label: "Last 3 Months" },
   ];
 
+  const fetchTransactions = async () => {
+    const res = await fetch(`${supabaseUrl}/rest/v1/transactions?select=*`, {
+      headers: {
+        apikey: supabaseApiKey, // Replace with your Supabase API key
+        Authorization: `Bearer ${supabaseApiKey}`, // Replace with your Supabase API key
+        "Content-Type": "application/json",
+      },
+    });
+    const data = await res.json();
+
+    const sortedData = data.sort((a, b) => new Date(b.date) - new Date(a.date));
+
+    setTransactions(sortedData);
+    setFilteredTransactions(sortedData);
+  };
+
   useEffect(() => {
     const fetchUser = async () => {
       try {
@@ -64,24 +80,6 @@ function Dashboard({ supabaseUrl, supabaseApiKey }) {
       } catch (error) {
         console.error("Error fetching user:", error);
       }
-    };
-
-    const fetchTransactions = async () => {
-      const res = await fetch(`${supabaseUrl}/rest/v1/transactions?select=*`, {
-        headers: {
-          apikey: supabaseApiKey, // Replace with your Supabase API key
-          Authorization: `Bearer ${supabaseApiKey}`, // Replace with your Supabase API key
-          "Content-Type": "application/json",
-        },
-      });
-      const data = await res.json();
-
-      const sortedData = data.sort(
-        (a, b) => new Date(b.date) - new Date(a.date)
-      );
-
-      setTransactions(sortedData);
-      setFilteredTransactions(sortedData);
     };
 
     const fetchCategories = async () => {
@@ -344,6 +342,7 @@ function Dashboard({ supabaseUrl, supabaseApiKey }) {
         setPopup={setPopup}
         supabaseApiKey={supabaseApiKey}
         supabaseUrl={supabaseUrl}
+        onTransactionAdded={fetchTransactions}
       />
     </section>
   );

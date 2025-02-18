@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { v4 as uuidv4 } from "uuid";
+import Swal from "sweetalert2";
 
 import "../styles/NewTransactionForm.scss";
 
@@ -9,6 +10,7 @@ function NewTransactionForm({
   setPopup,
   supabaseUrl,
   supabaseApiKey,
+  onTransactionAdded,
 }) {
   const [description, setDescription] = useState("");
   const [selectedType, setSelectedType] = useState("");
@@ -44,6 +46,15 @@ function NewTransactionForm({
   const filteredCategories = categories.filter(
     (category) => category.type === selectedType
   );
+
+  const emptyForm = () => {
+    setDescription("");
+    setSelectedType("");
+    setSelectedCategory("");
+    setAmount("");
+    setDate("");
+    setTime("");
+  };
 
   const handleSubmit = (event) => {
     event.preventDefault();
@@ -84,10 +95,24 @@ function NewTransactionForm({
         return text ? JSON.parse(text) : {};
       })
       .then((data) => {
-        console.log("Transaction added:", data);
+        Swal.fire({
+          title: "Success",
+          text: "Transaction added",
+          icon: "success",
+        });
+        setPopup(false);
+        emptyForm();
+        if (onTransactionAdded) {
+          onTransactionAdded();
+        }
       })
       .catch((error) => {
         console.error("Error:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: "Something went wrong!",
+        });
       });
   };
 
@@ -96,7 +121,13 @@ function NewTransactionForm({
       <div className="inner">
         <div className="head">
           <h3>Add New Transaction</h3>
-          <span className="close" onClick={() => setPopup(false)}>
+          <span
+            className="close"
+            onClick={() => {
+              setPopup(false);
+              emptyForm();
+            }}
+          >
             x
           </span>
         </div>
