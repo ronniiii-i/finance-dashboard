@@ -99,10 +99,8 @@ const SpendingCategoryPieChart = ({ transactions, categories, timeRangeOptions }
   // Update data when time range or custom dates change
   useEffect(() => {
     const filteredTransactions = filterTransactionsByTimeRange(transactions, timeRange);
-    console.log("Filtered Transactions:", filteredTransactions); // Log filtered transactions
 
     const chartData = calculateExpensesByCategory(filteredTransactions, categories);
-    console.log("Chart Data:", chartData); // Log chart data
 
     setData(chartData);
   }, [timeRange, transactions, categories, customStartDate, customEndDate]);

@@ -99,8 +99,6 @@ function Dashboard({ supabaseUrl, supabaseApiKey }) {
     fetchUser();
     fetchTransactions();
     fetchCategories();
-    console.log("Supabase URL:", supabaseUrl);
-    console.log("Supabase API Key:", supabaseApiKey);
   }, []);
 
   const filterTransactions = (type) => {
