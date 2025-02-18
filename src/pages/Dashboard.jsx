@@ -99,6 +99,8 @@ function Dashboard({ supabaseUrl, supabaseApiKey }) {
     fetchUser();
     fetchTransactions();
     fetchCategories();
+    console.log("Supabase URL:", supabaseUrl);
+    console.log("Supabase API Key:", supabaseApiKey);
   }, []);
 
   const filterTransactions = (type) => {
@@ -342,6 +344,8 @@ function Dashboard({ supabaseUrl, supabaseApiKey }) {
         categories={categories}
         popup={popup}
         setPopup={setPopup}
+        supabaseApiKey={supabaseApiKey}
+        supabaseUrl={supabaseUrl}
       />
     </section>
   );

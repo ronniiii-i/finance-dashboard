@@ -132,7 +132,7 @@ function NewTransactionForm({
               </option>
               {selectedType &&
                 filteredCategories.map((category) => (
-                  <option key={category.id} value={category.id}>
+                  <option key={category.id} value={category.name}>
                     {category.name}
                   </option>
                 ))}
