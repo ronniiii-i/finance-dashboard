@@ -39,7 +39,7 @@ function Dashboard({ supabaseUrl, supabaseApiKey }) {
     const fetchUser = async () => {
       try {
         const res = await fetch(
-          `${supabaseUrl}/rest/v1/users?select=*`, // Replace 'users' with your table name
+          `${supabaseUrl}/rest/v1/names?select=*`, // Replace 'users' with your table name
           {
             headers: {
               apikey: supabaseApiKey, // Replace with your Supabase API key
@@ -183,7 +183,7 @@ function Dashboard({ supabaseUrl, supabaseApiKey }) {
       <div className="top flex justify-between">
         <div className="text">
           <h3>Dashboard</h3>
-          <p>Hello, {user}!</p>
+          <p>Hello, {user.name}!</p>
         </div>
         <div className="buttons flex align-center">
           <button className="flex align-center justify-center">
