@@ -12,14 +12,14 @@ export const exportCSV = ({ mode, summary, transactions, allTransactions }) => {
       ['Total Expenses', `€${summary.expense}`],
       [],
       ['Date', 'Description', 'Category', 'Type', 'Amount (€)'],
-      ...transactions.map(t => [t.date, t.description, t.category, t.type, `€${t.amount}`]),
+      ...transactions.map(t => [t.date, t.note, t.category, t.type, `€${t.amount}`]),
     ];
   } else if (mode === 'transactions') {
     csvData = [
       ['Transaction History'],
       [],
       ['Date', 'Description', 'Category', 'Type', 'Amount (€)'],
-      ...allTransactions.map(t => [t.date, t.description, t.category, t.type, `€${t.amount}`]),
+      ...allTransactions.map(t => [t.date, t.note, t.category, t.type, `€${t.amount}`]),
     ];
   } else if (mode === 'reports') {
     csvData = [
@@ -30,7 +30,7 @@ export const exportCSV = ({ mode, summary, transactions, allTransactions }) => {
       ['Balance', `€${summary.balance}`],
       [],
       ['Date', 'Description', 'Category', 'Type', 'Amount (€)'],
-      ...allTransactions.map(t => [t.date, t.description, t.category, t.type, `€${t.amount}`]),
+      ...allTransactions.map(t => [t.date, t.note, t.category, t.type, `€${t.amount}`]),
     ];
   }
 
