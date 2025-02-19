@@ -55,70 +55,68 @@ function NewTransactionForm({ popup, setPopup, mode, transactionId }) {
     setTime("");
   };
 
- const handleSubmit = (event) => {
-   event.preventDefault();
+  const handleSubmit = (event) => {
+    event.preventDefault();
 
-   // Generate a UUID for new transactions, reuse ID for edits
-   const id = mode === "edit" ? transactionId : uuidv4();
+    // Generate a UUID for new transactions, reuse ID for edits
+    const id = mode === "edit" ? transactionId : uuidv4();
 
-   // Create the full date
-   const fullDate = date && time ? new Date(`${date}T${time}`) : null;
-   const formattedDate = fullDate ? fullDate.toISOString() : null;
+    // Create the full date
+    const fullDate = date && time ? new Date(`${date}T${time}`) : null;
+    const formattedDate = fullDate ? fullDate.toISOString() : null;
 
-   // Prepare form data
-   const formData = {
-     note: description,
-     type: selectedType,
-     category: selectedCategory,
-     amount: parseFloat(amount),
-     date: formattedDate,
-   };
+    // Prepare form data
+    const formData = {
+      id: id,
+      note: description,
+      type: selectedType,
+      category: selectedCategory,
+      amount: parseFloat(amount),
+      date: formattedDate,
+    };
 
-   // Determine request method & endpoint
-   const requestOptions = {
-     method: mode === "edit" ? "PATCH" : "POST",
-     headers: {
-       apikey: supabaseApiKey,
-       Authorization: `Bearer ${supabaseApiKey}`,
-       "Content-Type": "application/json",
-     },
-     body: JSON.stringify(formData),
-   };
+    // Determine request method & endpoint
+    const requestOptions = {
+      method: mode === "edit" ? "PATCH" : "POST",
+      headers: {
+        apikey: supabaseApiKey,
+        Authorization: `Bearer ${supabaseApiKey}`,
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(formData),
+    };
 
-   const url =
-     mode === "edit"
-       ? `${supabaseUrl}/rest/v1/transactions?id=eq.${id}` // Update existing transaction
-       : `${supabaseUrl}/rest/v1/transactions`; // Create new transaction
+    const url =
+      mode === "edit"
+        ? `${supabaseUrl}/rest/v1/transactions?id=eq.${id}` // Update existing transaction
+        : `${supabaseUrl}/rest/v1/transactions`; // Create new transaction
 
-   fetch(url, requestOptions)
-     .then(async (response) => {
-       if (!response.ok) {
-         throw new Error("Unauthorized or some other error");
-       }
-       return response.text().then((text) => (text ? JSON.parse(text) : {}));
-     })
-     .then(() => {
-       Swal.fire({
-         title: "Success",
-         text: mode === "edit" ? "Transaction updated" : "Transaction added",
-         icon: "success",
-       });
-       setPopup(false);
-       emptyForm();
-       if (fetchTransactions) {
-         fetchTransactions();
-       }
-     })
-     .catch((error) => {
-       console.error("Error:", error);
-       Swal.fire({
-         icon: "error",
-         title: "Oops...",
-         text: "Something went wrong!",
-       });
-     });
- };
-
+    fetch(url, requestOptions)
+      .then(async (response) => {
+        if (!response.ok) {
+          throw new Error("Unauthorized or some other error");
+        }
+        return response.text().then((text) => (text ? JSON.parse(text) : {}));
+      })
+      .then(() => {
+        Swal.fire({
+          title: "Success",
+          text: mode === "edit" ? "Transaction updated" : "Transaction added",
+          icon: "success",
+        });
+        setPopup(false);
+        emptyForm();
+        fetchTransactions();
+      })
+      .catch((error) => {
+        console.error("Error:", error);
+        Swal.fire({
+          icon: "error",
+          title: "Oops...",
+          text: "Something went wrong!",
+        });
+      });
+  };
 
   useEffect(() => {
     if (mode === "edit" && transactionId) {
