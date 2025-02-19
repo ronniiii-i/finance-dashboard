@@ -74,7 +74,7 @@ function SideNav() {
       <nav>
         <ul>
           <li>
-            <Link className="flex align-center" to="/dashboard">
+            <Link className="flex align-center" to="/">
               <VscDashboard />
               Dashboard
             </Link>
