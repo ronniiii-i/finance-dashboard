@@ -125,7 +125,6 @@ const SpendingCategoryPieChart = ({
     onSummaryUpdate && onSummaryUpdate(summaryData);
 
     setData(summaryData.spendingBreakdown);
-    console.log(summaryData);
     
   }, [timeRange, transactions, categories, customStartDate, customEndDate]);
 

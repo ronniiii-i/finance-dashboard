@@ -1,15 +1,13 @@
-import { useState, useEffect, useCallback } from "react";
-import PropTypes from "prop-types";
+import { useState } from "react";
 
 import { CiExport } from "react-icons/ci";
 import { IoMdAdd } from "react-icons/io";
 import {
   IoArrowDownCircleOutline,
   IoArrowUpCircleOutline,
-  IoChevronForwardOutline,
-  IoChevronBackOutline,
-  IoFilterOutline,
 } from "react-icons/io5";
+
+import { useTransactions } from "../context/TransactionsContext";
 
 import Transactions from "../components/Transactions";
 import IncomeExpenseChart from "../components/IncomeExpenseChart";
@@ -23,17 +21,12 @@ import { exportPDF } from "../utils/exportPDF";
 
 import "../styles/dashboard.scss";
 
-function Dashboard({ supabaseUrl, supabaseApiKey }) {
+function Dashboard() {
   const [popup, setPopup] = useState(false);
+  const [popupMode, setPopupMode] = useState("");
   const [exportPopup, setExportPopup] = useState(false);
-  const [user, setUser] = useState([]);
-  const [transactions, setTransactions] = useState([]);
-  const [reportTransaction, setReportTransaction] = useState([]);
-  const [categories, setCategories] = useState([]);
-  const [filteredTransactions, setFilteredTransactions] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [transactionsPerPage] = useState(5);
-  const [showFilter, setShowFilter] = useState(false);
   const timeRangeOptions = [
     { value: "7days", label: "Last 7 Days" },
     { value: "14days", label: "Last 2 Weeks" },
@@ -41,87 +34,12 @@ function Dashboard({ supabaseUrl, supabaseApiKey }) {
     { value: "3months", label: "Last 3 Months" },
   ];
 
-  const fetchTransactions = useCallback(async () => {
-    const res = await fetch(`${supabaseUrl}/rest/v1/transactions?select=*`, {
-      headers: {
-        apikey: supabaseApiKey,
-        Authorization: `Bearer ${supabaseApiKey}`,
-        "Content-Type": "application/json",
-      },
-    });
-    const data = await res.json();
-
-    const sortedData = data.sort((a, b) => new Date(b.date) - new Date(a.date));
-
-    setTransactions(sortedData);
-    setFilteredTransactions(sortedData);
-    setReportTransaction(sortedData.slice(0, 30)); // Use sortedData directly
-  }, [supabaseUrl, supabaseApiKey]);
-
-  useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const res = await fetch(
-          `${supabaseUrl}/rest/v1/names?select=*`, // Replace 'users' with your table name
-          {
-            headers: {
-              apikey: supabaseApiKey, // Replace with your Supabase API key
-              Authorization: `Bearer ${supabaseApiKey}`, // Replace with your Supabase API key
-              "Content-Type": "application/json",
-            },
-          }
-        );
-
-        if (!res.ok) {
-          throw new Error(`Failed to fetch user: ${res.statusText}`);
-        }
-
-        const data = await res.json();
-
-        // Assuming the response is an array of users and you want the first user
-        if (data.length > 0) {
-          setUser(data[0]); // Set the first user in the array
-        } else {
-          console.error("No user found");
-        }
-      } catch (error) {
-        console.error("Error fetching user:", error);
-      }
-    };
-
-    const fetchCategories = async () => {
-      const res = await fetch(`${supabaseUrl}/rest/v1/categories?select=*`, {
-        headers: {
-          apikey: supabaseApiKey, // Replace with your Supabase API key
-          Authorization: `Bearer ${supabaseApiKey}`, // Replace with your Supabase API key
-          "Content-Type": "application/json",
-        },
-      });
-      const data = await res.json();
-      setCategories(data);
-    };
-
-    fetchUser();
-    fetchTransactions();
-    fetchCategories();
-  }, [fetchTransactions, supabaseUrl, supabaseApiKey]);
-
-  const filterTransactions = (type) => {
-    const filtered = transactions.filter(
-      (transaction) => transaction.type === type
-    );
-    setFilteredTransactions(filtered);
-
-    setCurrentPage(1);
-  };
+  const { transactions, recentTransactions, user, categories, summary } =
+    useTransactions();
 
   const indexOfLastTransaction = currentPage * transactionsPerPage;
   const indexOfFirstTransaction = indexOfLastTransaction - transactionsPerPage;
-  const recentTransactions = filteredTransactions.slice(0, 30);
-  const currentTransactions = recentTransactions.slice(
-    indexOfFirstTransaction,
-    indexOfLastTransaction
-  );
+  const currentTransactions = recentTransactions;
 
   // Function to calculate the total income for a given month
   const calculateMonthlyIncome = (month) => {
@@ -159,65 +77,10 @@ function Dashboard({ supabaseUrl, supabaseApiKey }) {
   const monthlyExpense = calculateMonthlyExpense(currentMonth);
   const balance = calculateBalance(monthlyIncome, monthlyExpense);
 
-  const [summary, setSummary] = useState({
-    income: monthlyIncome,
-    expense: monthlyExpense,
-    balance,
-    spending: { total: 0, breakdown: [] },
-  });
-
-  useEffect(() => {
-    setSummary((prev) => {
-      if (
-        prev.income !== monthlyIncome ||
-        prev.expense !== monthlyExpense ||
-        prev.balance !== balance
-      ) {
-        return {
-          ...prev,
-          income: monthlyIncome,
-          expense: monthlyExpense,
-          balance,
-        };
-      }
-      return prev;
-    });
-  }, [monthlyIncome, monthlyExpense, balance]);
-
-  const handleSummaryUpdate = useCallback((summaryData) => {
-    setSummary((prev) => {
-      if (
-        prev.spending.total !== summaryData.totalExpenses ||
-        JSON.stringify(prev.spending.breakdown) !==
-          JSON.stringify(summaryData.spendingBreakdown)
-      ) {
-        return {
-          ...prev,
-          spending: {
-            total: summaryData.totalExpenses,
-            breakdown: summaryData.spendingBreakdown,
-          },
-        };
-      }
-      return prev;
-    });
-  }, []);
-
   // Calculate the previous month's income, expense, and balance
   const lastMonthIncome = calculateMonthlyIncome(previousMonth);
   const lastMonthExpense = calculateMonthlyExpense(previousMonth);
   const lastMonthBalance = calculateBalance(lastMonthIncome, lastMonthExpense);
-
-  const paginate = (pageNumber) => setCurrentPage(pageNumber);
-
-  const toggleFilter = () => {
-    setShowFilter(!showFilter); // Toggle the state
-  };
-
-  const resetFilter = () => {
-    setFilteredTransactions(transactions);
-    setShowFilter(false); // Close the filter dropdown
-  };
 
   const totalBudget = 5000; // Example total budget
   const totalSpent = 4200; // Example total spending
@@ -228,13 +91,13 @@ function Dashboard({ supabaseUrl, supabaseApiKey }) {
   ]; // Example category expenses
 
   const handleExportCSV = () => {
-    console.log(reportTransaction);
+    console.log(recentTransactions);
 
-    exportCSV({ mode: "dashboard", summary, reportTransaction });
+    exportCSV({ mode: "dashboard", summary, recentTransactions });
   };
 
   const handleExportPDF = () => {
-    exportPDF({ mode: "dashboard", summary, reportTransaction });
+    exportPDF({ mode: "dashboard", summary, recentTransactions });
   };
 
   return (
@@ -253,7 +116,7 @@ function Dashboard({ supabaseUrl, supabaseApiKey }) {
           </button>
           <button
             className="flex align-center justify-center secondary"
-            onClick={() => setPopup(true)}
+            onClick={() => {setPopup(true); setPopupMode("add")}}
           >
             <IoMdAdd /> Add Entry
           </button>
@@ -270,7 +133,7 @@ function Dashboard({ supabaseUrl, supabaseApiKey }) {
               >
                 x
               </span>
-              </div>
+            </div>
             <button onClick={handleExportCSV}>Export CSV</button>
             <button onClick={handleExportPDF}>Export PDF</button>
           </div>
@@ -362,46 +225,16 @@ function Dashboard({ supabaseUrl, supabaseApiKey }) {
             <IncomeExpenseChart transactions={transactions} />
           </div>
           <div className="recent">
-            <div className="top flex align-center justify-between">
-              <h4>Recent Transactions</h4>
-              <ul className={`filter ${showFilter ? "" : "overflow-hidden"}`}>
-                <li
-                  onClick={toggleFilter}
-                  className="flex align-center justify-between"
-                >
-                  Filter <IoFilterOutline />
-                </li>
-                <div className={showFilter ? "show" : ""}>
-                  <li onClick={() => filterTransactions("income")}>Income</li>
-                  <li onClick={() => filterTransactions("expense")}>Expense</li>
-                  <li onClick={resetFilter}>All</li> {/* Show all */}
-                </div>
-              </ul>
-            </div>
-            <Transactions transactions={currentTransactions} />
-            <div className="pagination flex justify-between align-center">
-              <p>
-                Showing {indexOfFirstTransaction + 1} to{" "}
-                {indexOfLastTransaction} of {recentTransactions.length} results
-              </p>
-              <div className="buttons flex align-center">
-                <button
-                  onClick={() => paginate(currentPage - 1)}
-                  disabled={currentPage === 1}
-                >
-                  <IoChevronBackOutline />
-                </button>
-                <button
-                  onClick={() => paginate(currentPage + 1)}
-                  disabled={
-                    currentPage ===
-                    Math.ceil(recentTransactions.length / transactionsPerPage)
-                  }
-                >
-                  <IoChevronForwardOutline />
-                </button>
-              </div>
-            </div>
+            <Transactions
+              transactions={currentTransactions}
+              page="dashboard"
+              setCurrentPage={setCurrentPage}
+              indexOfFirstTransaction={indexOfFirstTransaction}
+              indexOfLastTransaction={indexOfLastTransaction}
+              recentTransactions={recentTransactions}
+              currentPage={currentPage}
+              transactionsPerPage={transactionsPerPage}
+            />
           </div>
         </div>
         <div className="w-1">
@@ -409,7 +242,7 @@ function Dashboard({ supabaseUrl, supabaseApiKey }) {
             transactions={transactions}
             categories={categories}
             timeRangeOptions={timeRangeOptions}
-            onSummaryUpdate={handleSummaryUpdate}
+            // onSummaryUpdate={handleSummaryUpdate}
           />
           <BudgetGauge budget={totalBudget} spent={totalSpent} />
           <BudgetBreakdown
@@ -423,16 +256,11 @@ function Dashboard({ supabaseUrl, supabaseApiKey }) {
         categories={categories}
         popup={popup}
         setPopup={setPopup}
-        supabaseApiKey={supabaseApiKey}
-        supabaseUrl={supabaseUrl}
-        onTransactionAdded={fetchTransactions}
+        mode={popupMode}
+        // onTransactionAdded={fetchTransactions}
       />
     </section>
   );
 }
-Dashboard.propTypes = {
-  supabaseUrl: PropTypes.string.isRequired,
-  supabaseApiKey: PropTypes.string.isRequired,
-};
 
 export default Dashboard;

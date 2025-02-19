@@ -4,8 +4,8 @@ import "jspdf-autotable";
 export const exportPDF = ({
   mode,
   summary,
-  reportTransaction,
-  allTransactions,
+  recentTransactions,
+  transactions,
 }) => {
   const doc = new jsPDF();
   const marginLeft = 14;
@@ -46,7 +46,7 @@ export const exportPDF = ({
         item.category,
         `£${item.amount}`,
         `${item.percentage}%`,
-        console.log(item)
+        console.log(item),
       ]),
       theme: "grid",
     });
@@ -66,7 +66,7 @@ export const exportPDF = ({
   doc.autoTable({
     startY: yPos,
     head: [["Date", "Description", "Category", "Type", "Amount (£)"]],
-    body: (mode === "dashboard" ? reportTransaction : allTransactions).map(
+    body: (mode === "dashboard" ? recentTransactions : transactions).map(
       (t) => [t.date, t.note, t.category, t.type, `£${t.amount}`]
     ),
     theme: "grid",

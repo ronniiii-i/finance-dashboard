@@ -1,94 +1,102 @@
 import { useState } from "react";
 
+import { CiExport } from "react-icons/ci";
+import { IoMdAdd } from "react-icons/io";
+
 import Transactions from "../components/Transactions";
-// import "../styles/add-transaction.scss";
+import NewTransactionForm from "../components/NewTransactionForm";
+
+import { useTransactions } from "../context/TransactionsContext";
+
+import { exportCSV } from "../utils/exportCSV";
+import { exportPDF } from "../utils/exportPDF";
 
 function Transaction() {
+  const { transactions,recentTransactions, summary } = useTransactions();
   const [popup, setPopup] = useState(false);
+  const [popupMode, setPopupMode] = useState("");
+  const [selectedTransactionId, setSelectedTransactionId] = useState(null);
+  const [exportPopup, setExportPopup] = useState(false);
+  const [currentPage, setCurrentPage] = useState(1);
+  const [transactionsPerPage] = useState(15);
 
-  const transactions = [
-    {
-      id: 1,
-      note: "Groceries",
-      type: "Expense",
-      category: "Food",
-      amount: 50,
-      date: "2025-01-05",
-    },
-    {
-      id: 2,
-      note: "Salary",
-      type: "Income",
-      category: "Food",
-      amount: 1000,
-      date: "2025-01-04",
-    },
-    {
-      id: 3,
-      note: "Electricity Bill",
-      type: "Expense",
-      category: "Food",
-      amount: 75,
-      date: "2025-01-03",
-    },
-    {
-      id: 4,
-      note: "Freelance Job",
-      type: "Income",
-      category: "Food",
-      amount: 500,
-      date: "2025-01-02",
-    },
-    {
-      id: 5,
-      note: "Netflix Subscription",
-      type: "Expense",
-      category: "Food",
-      amount: 15,
-      date: "2025-01-01",
-    },
-  ];
+  
+  const indexOfLastTransaction = currentPage * transactionsPerPage;
+  const indexOfFirstTransaction = indexOfLastTransaction - transactionsPerPage;
+
+  const handleExportCSV = () => {
+    exportCSV({ mode: "dashboard", summary, transactions });
+  };
+
+  const handleExportPDF = () => {
+    exportPDF({ mode: "dashboard", summary, transactions });
+  };
 
   return (
     <section id="transactions">
-      <div
-        className={`module ${
-          popup ? "show-extend" : "hide"
-        } flex  justify-center align-center`}
-      >
-        <h1
-          onClick={() => {
-            setPopup(!popup);
-          }}
-        >
-          x
-        </h1>
-        <form className="flex column justify-between align-center full-width">
-          <h2>Add Transaction</h2>
-          <input type="text" placeholder="Description" />
-          <input type="number" placeholder="Amount" />
-          <select>
-            <option value="Income">Income</option>
-            <option value="Expense">Expense</option>
-          </select>
-          <input type="date" />
-          <button className="button-secondary" type="submit">
-            Add Transaction
+      <div className="top flex justify-between">
+        <div className="text">
+          <h3>Transactions</h3>
+        </div>
+        <div className="buttons flex align-center">
+          <button
+            className="flex align-center justify-center"
+            onClick={() => setExportPopup(true)}
+          >
+            <CiExport /> Export
           </button>
-        </form>
+          <button
+            className="flex align-center justify-center secondary"
+            onClick={() => {
+              setPopup(true);
+              setPopupMode("add");
+            }}
+          >
+            <IoMdAdd /> Add Entry
+          </button>
+        </div>
+        <div className={`export-popup ${exportPopup ? "active" : ""}`}>
+          <div className="inner">
+            <div className="head">
+              <h3>Export Options</h3>
+              <span
+                className="close"
+                onClick={() => {
+                  setExportPopup(false);
+                }}
+              >
+                x
+              </span>
+            </div>
+            <button onClick={handleExportCSV}>Export CSV</button>
+            <button onClick={handleExportPDF}>Export PDF</button>
+          </div>
+        </div>
       </div>
-      <button
-        className="button-secondary flex justify-center align-center"
-        onClick={() => {
-          setPopup(!popup);
-        }}
-      >
-        Add New Transaction <h3>+</h3>
-      </button>
       <div>
-        <h2>Transactions</h2>
-        <Transactions transactions={transactions} />
+        <Transactions
+          transactions={transactions}
+          setCurrentPage={setCurrentPage}
+          indexOfFirstTransaction={indexOfFirstTransaction}
+          indexOfLastTransaction={indexOfLastTransaction}
+          recentTransactions={recentTransactions}
+          currentPage={currentPage}
+          transactionsPerPage={transactionsPerPage}
+          setPopup={setPopup}
+          popup={popup}
+          setPopupMode={setPopupMode}
+          popupMode={popupMode}
+          setSelectedTransactionId={setSelectedTransactionId}
+        />
       </div>
+
+      {/* Popup */}
+      <NewTransactionForm
+        popup={popup}
+        setPopup={setPopup}
+        mode={popupMode}
+        transactionId={selectedTransactionId}
+      />
     </section>
   );
 }

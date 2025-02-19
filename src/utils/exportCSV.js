@@ -1,37 +1,60 @@
-import { unparse } from 'papaparse';
-import { saveAs } from 'file-saver';
+import { unparse } from "papaparse";
+import { saveAs } from "file-saver";
 
-export const exportCSV = ({ mode, summary, reportTransaction, allTransactions }) => {
+export const exportCSV = ({
+  mode,
+  summary,
+  recentTransactions,
+  transactions,
+}) => {
   let csvData = [];
 
-  if (mode === 'dashboard') {
+  if (mode === "dashboard") {
     csvData = [
-      ['Recent Transactions'], // Title
+      ["Recent Transactions"], // Title
       [],
-      ['Total Income', `£${summary.income}`],
-      ['Total Expenses', `£${summary.expense}`],
+      ["Total Income", `£${summary.income}`],
+      ["Total Expenses", `£${summary.expense}`],
       [],
-      ['Date', 'Description', 'Category', 'Type', 'Amount (£)'],
-      ...reportTransaction.map(t => [t.date, t.note, t.category, t.type, `£${t.amount}`]),
+      ["Date", "Description", "Category", "Type", "Amount (£)"],
+      ...recentTransactions.map((t) => [
+        t.date,
+        t.note,
+        t.category,
+        t.type,
+        `£${t.amount}`,
+      ]),
     ];
-    // console.log(reportTransaction);
-  } else if (mode === 'transactions') {
+    // console.log(recentTransactions);
+  } else if (mode === "transactions") {
     csvData = [
-      ['Transaction History'],
+      ["Transaction History"],
       [],
-      ['Date', 'Description', 'Category', 'Type', 'Amount (£)'],
-      ...allTransactions.map(t => [t.date, t.note, t.category, t.type, `£${t.amount}`]),
+      ["Date", "Description", "Category", "Type", "Amount (£)"],
+      ...transactions.map((t) => [
+        t.date,
+        t.note,
+        t.category,
+        t.type,
+        `£${t.amount}`,
+      ]),
     ];
-  } else if (mode === 'reports') {
+  } else if (mode === "reports") {
     csvData = [
-      ['Full Financial Report'],
+      ["Full Financial Report"],
       [],
-      ['Total Income', `£${summary.income}`],
-      ['Total Expenses', `£${summary.expense}`],
-      ['Balance', `£${summary.balance}`],
+      ["Total Income", `£${summary.income}`],
+      ["Total Expenses", `£${summary.expense}`],
+      ["Balance", `£${summary.balance}`],
       [],
-      ['Date', 'Description', 'Category', 'Type', 'Amount (£)'],
-      ...allTransactions.map(t => [t.date, t.note, t.category, t.type, `£${t.amount}`]),
+      ["Date", "Description", "Category", "Type", "Amount (£)"],
+      ...transactions.map((t) => [
+        t.date,
+        t.note,
+        t.category,
+        t.type,
+        `£${t.amount}`,
+      ]),
     ];
   }
 
