@@ -25,6 +25,7 @@ import "../styles/dashboard.scss";
 
 function Dashboard({ supabaseUrl, supabaseApiKey }) {
   const [popup, setPopup] = useState(false);
+  const [exportPopup, setExportPopup] = useState(false);
   const [user, setUser] = useState([]);
   const [transactions, setTransactions] = useState([]);
   const [reportTransaction, setReportTransaction] = useState([]);
@@ -244,7 +245,10 @@ function Dashboard({ supabaseUrl, supabaseApiKey }) {
           <p>Hello, {user.name}!</p>
         </div>
         <div className="buttons flex align-center">
-          <button className="flex align-center justify-center">
+          <button
+            className="flex align-center justify-center"
+            onClick={() => setExportPopup(true)}
+          >
             <CiExport /> Export
           </button>
           <button
@@ -253,8 +257,23 @@ function Dashboard({ supabaseUrl, supabaseApiKey }) {
           >
             <IoMdAdd /> Add Entry
           </button>
-          <button onClick={handleExportCSV}>Export CSV</button>
-          <button onClick={handleExportPDF}>Export PDF</button>
+        </div>
+        <div className={`export-popup ${exportPopup ? "active" : ""}`}>
+          <div className="inner">
+            <div className="head">
+              <h3>Export Options</h3>
+              <span
+                className="close"
+                onClick={() => {
+                  setExportPopup(false);
+                }}
+              >
+                x
+              </span>
+              </div>
+            <button onClick={handleExportCSV}>Export CSV</button>
+            <button onClick={handleExportPDF}>Export PDF</button>
+          </div>
         </div>
       </div>
       <div className="flex full-width">
