@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import { VscDashboard } from "react-icons/vsc";
 import { CiDollar, CiSearch } from "react-icons/ci";
 import { PiChartLineThin } from "react-icons/pi";
+import { GiMoneyStack } from "react-icons/gi";
 
 import "../styles/sidenav.scss";
 
@@ -89,6 +90,12 @@ function SideNav() {
             <Link className="flex align-center" to="/reports">
               <PiChartLineThin />
               Reports
+            </Link>
+          </li>
+          <li>
+            <Link className="flex align-center" to="/budgets">
+              <GiMoneyStack />
+              Budgets
             </Link>
           </li>
         </ul>
