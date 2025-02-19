@@ -1,4 +1,5 @@
 import { useState } from "react";
+import PropTypes from "prop-types";
 import { v4 as uuidv4 } from "uuid";
 import Swal from "sweetalert2";
 
@@ -94,7 +95,7 @@ function NewTransactionForm({
         const text = await response.text();
         return text ? JSON.parse(text) : {};
       })
-      .then((data) => {
+      .then(() => {
         Swal.fire({
           title: "Success",
           text: "Transaction added",
@@ -206,5 +207,13 @@ function NewTransactionForm({
     </div>
   );
 }
+NewTransactionForm.propTypes = {
+  categories: PropTypes.array.isRequired,
+  popup: PropTypes.bool.isRequired,
+  setPopup: PropTypes.func.isRequired,
+  supabaseUrl: PropTypes.string.isRequired,
+  supabaseApiKey: PropTypes.string.isRequired,
+  onTransactionAdded: PropTypes.func,
+};
 
 export default NewTransactionForm;

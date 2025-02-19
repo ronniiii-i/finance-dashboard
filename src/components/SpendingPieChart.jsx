@@ -1,7 +1,14 @@
-import React, { useState, useEffect } from "react";
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable react/prop-types */
+import { useState, useEffect } from "react";
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from "recharts";
 
-const SpendingCategoryPieChart = ({ transactions, categories, timeRangeOptions }) => {
+const SpendingCategoryPieChart = ({
+  transactions,
+  categories,
+  timeRangeOptions,
+  onSummaryUpdate,
+}) => {
   const [timeRange, setTimeRange] = useState("7days"); // Default time range
   const [customStartDate, setCustomStartDate] = useState("");
   const [customEndDate, setCustomEndDate] = useState("");
@@ -70,40 +77,59 @@ const SpendingCategoryPieChart = ({ transactions, categories, timeRangeOptions }
   // Function to calculate total expenses by category
   const calculateExpensesByCategory = (transactions, categories) => {
     const expenses = {};
+    let totalExpenses = 0;
 
-    // Initialize expenses object with category names and amounts
     categories.forEach((category) => {
       if (category.type === "expense") {
         expenses[category.name] = 0;
       }
     });
 
-    // Sum up amounts for each category
     transactions.forEach((transaction) => {
       if (transaction.type === "expense") {
-        const category = categories.find((cat) => cat.name === transaction.category);
+        const category = categories.find(
+          (cat) => cat.name === transaction.category
+        );
         if (category) {
           expenses[category.name] += transaction.amount;
+          totalExpenses += transaction.amount;
         }
       }
     });
 
-    // Format data for the pie chart
-    return Object.keys(expenses).map((name) => ({
-      name,
-      value: expenses[name],
+    const spendingBreakdown = Object.keys(expenses).map((name) => ({
+      category: name,
+      amount: expenses[name],
+      percentage:
+        totalExpenses > 0
+          ? ((expenses[name] / totalExpenses) * 100).toFixed(2)
+          : 0,
       color: categories.find((cat) => cat.name === name)?.color || "#000",
     }));
+
+    return { totalExpenses, spendingBreakdown };
   };
 
   // Update data when time range or custom dates change
   useEffect(() => {
-    const filteredTransactions = filterTransactionsByTimeRange(transactions, timeRange);
+    const filteredTransactions = filterTransactionsByTimeRange(
+      transactions,
+      timeRange
+    );
 
-    const chartData = calculateExpensesByCategory(filteredTransactions, categories);
+    const summaryData = calculateExpensesByCategory(
+      filteredTransactions,
+      categories
+    );
 
-    setData(chartData);
+    onSummaryUpdate && onSummaryUpdate(summaryData);
+
+    setData(summaryData.spendingBreakdown);
+    console.log(summaryData);
+    
   }, [timeRange, transactions, categories, customStartDate, customEndDate]);
+
+
 
   return (
     <div className="pie">
@@ -115,13 +141,22 @@ const SpendingCategoryPieChart = ({ transactions, categories, timeRangeOptions }
             type="date"
             value={customStartDate}
             onChange={(e) => setCustomStartDate(e.target.value)}
-            style={{ marginRight: "10px", padding: "5px", borderRadius: "5px", border: "1px solid #ccc" }}
+            style={{
+              marginRight: "10px",
+              padding: "5px",
+              borderRadius: "5px",
+              border: "1px solid #ccc",
+            }}
           />
           <input
             type="date"
             value={customEndDate}
             onChange={(e) => setCustomEndDate(e.target.value)}
-            style={{ padding: "5px", borderRadius: "5px", border: "1px solid #ccc" }}
+            style={{
+              padding: "5px",
+              borderRadius: "5px",
+              border: "1px solid #ccc",
+            }}
           />
         </div>
       )}
@@ -134,10 +169,10 @@ const SpendingCategoryPieChart = ({ transactions, categories, timeRangeOptions }
             innerRadius={60}
             outerRadius={80}
             paddingAngle={5}
-            dataKey="value"
-            nameKey="name"
+            dataKey="amount"
+            nameKey="category"
             // label
-            style={{"maxWidth": "100px", "padding":"1rem"}}
+            style={{ maxWidth: "100px", padding: "1rem" }}
           >
             {data.map((entry, index) => (
               <Cell key={`cell-${index}`} fill={entry.color} />
@@ -147,7 +182,7 @@ const SpendingCategoryPieChart = ({ transactions, categories, timeRangeOptions }
           <Legend />
         </PieChart>
       </ResponsiveContainer>
-      
+
       <div className="filter-container">
         <select
           value={timeRange}

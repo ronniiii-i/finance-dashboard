@@ -1,4 +1,5 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
+import PropTypes from "prop-types";
 
 import { CiExport } from "react-icons/ci";
 import { IoMdAdd } from "react-icons/io";
@@ -26,6 +27,7 @@ function Dashboard({ supabaseUrl, supabaseApiKey }) {
   const [popup, setPopup] = useState(false);
   const [user, setUser] = useState([]);
   const [transactions, setTransactions] = useState([]);
+  const [reportTransaction, setReportTransaction] = useState([]);
   const [categories, setCategories] = useState([]);
   const [filteredTransactions, setFilteredTransactions] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
@@ -38,11 +40,11 @@ function Dashboard({ supabaseUrl, supabaseApiKey }) {
     { value: "3months", label: "Last 3 Months" },
   ];
 
-  const fetchTransactions = async () => {
+  const fetchTransactions = useCallback(async () => {
     const res = await fetch(`${supabaseUrl}/rest/v1/transactions?select=*`, {
       headers: {
-        apikey: supabaseApiKey, // Replace with your Supabase API key
-        Authorization: `Bearer ${supabaseApiKey}`, // Replace with your Supabase API key
+        apikey: supabaseApiKey,
+        Authorization: `Bearer ${supabaseApiKey}`,
         "Content-Type": "application/json",
       },
     });
@@ -52,7 +54,8 @@ function Dashboard({ supabaseUrl, supabaseApiKey }) {
 
     setTransactions(sortedData);
     setFilteredTransactions(sortedData);
-  };
+    setReportTransaction(sortedData.slice(0, 30)); // Use sortedData directly
+  }, [supabaseUrl, supabaseApiKey]);
 
   useEffect(() => {
     const fetchUser = async () => {
@@ -100,13 +103,14 @@ function Dashboard({ supabaseUrl, supabaseApiKey }) {
     fetchUser();
     fetchTransactions();
     fetchCategories();
-  }, []);
+  }, [fetchTransactions, supabaseUrl, supabaseApiKey]);
 
   const filterTransactions = (type) => {
     const filtered = transactions.filter(
       (transaction) => transaction.type === type
     );
     setFilteredTransactions(filtered);
+
     setCurrentPage(1);
   };
 
@@ -154,11 +158,49 @@ function Dashboard({ supabaseUrl, supabaseApiKey }) {
   const monthlyExpense = calculateMonthlyExpense(currentMonth);
   const balance = calculateBalance(monthlyIncome, monthlyExpense);
 
-  const summary = {
+  const [summary, setSummary] = useState({
     income: monthlyIncome,
     expense: monthlyExpense,
     balance,
-  };
+    spending: { total: 0, breakdown: [] },
+  });
+
+  useEffect(() => {
+    setSummary((prev) => {
+      if (
+        prev.income !== monthlyIncome ||
+        prev.expense !== monthlyExpense ||
+        prev.balance !== balance
+      ) {
+        return {
+          ...prev,
+          income: monthlyIncome,
+          expense: monthlyExpense,
+          balance,
+        };
+      }
+      return prev;
+    });
+  }, [monthlyIncome, monthlyExpense, balance]);
+
+  const handleSummaryUpdate = useCallback((summaryData) => {
+    setSummary((prev) => {
+      if (
+        prev.spending.total !== summaryData.totalExpenses ||
+        JSON.stringify(prev.spending.breakdown) !==
+          JSON.stringify(summaryData.spendingBreakdown)
+      ) {
+        return {
+          ...prev,
+          spending: {
+            total: summaryData.totalExpenses,
+            breakdown: summaryData.spendingBreakdown,
+          },
+        };
+      }
+      return prev;
+    });
+  }, []);
 
   // Calculate the previous month's income, expense, and balance
   const lastMonthIncome = calculateMonthlyIncome(previousMonth);
@@ -185,11 +227,13 @@ function Dashboard({ supabaseUrl, supabaseApiKey }) {
   ]; // Example category expenses
 
   const handleExportCSV = () => {
-    exportCSV({ mode: "dashboard", summary, recentTransactions });
+    console.log(reportTransaction);
+
+    exportCSV({ mode: "dashboard", summary, reportTransaction });
   };
 
   const handleExportPDF = () => {
-    exportPDF({ mode: "dashboard", summary, recentTransactions });
+    exportPDF({ mode: "dashboard", summary, reportTransaction });
   };
 
   return (
@@ -346,6 +390,7 @@ function Dashboard({ supabaseUrl, supabaseApiKey }) {
             transactions={transactions}
             categories={categories}
             timeRangeOptions={timeRangeOptions}
+            onSummaryUpdate={handleSummaryUpdate}
           />
           <BudgetGauge budget={totalBudget} spent={totalSpent} />
           <BudgetBreakdown
@@ -366,5 +411,9 @@ function Dashboard({ supabaseUrl, supabaseApiKey }) {
     </section>
   );
 }
+Dashboard.propTypes = {
+  supabaseUrl: PropTypes.string.isRequired,
+  supabaseApiKey: PropTypes.string.isRequired,
+};
 
 export default Dashboard;
