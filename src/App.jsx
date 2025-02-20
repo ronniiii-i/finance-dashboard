@@ -1,4 +1,5 @@
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { Analytics } from "@vercel/analytics/react";
 
 import SideNav from "./components/SideNav";
 import Dashboard from "./pages/Dashboard";
@@ -32,6 +33,8 @@ function App() {
             </Routes>
           </main>
         </div>
+
+        <Analytics />
       </TransactionsProvider>
     </Router>
   );
