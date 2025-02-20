@@ -27,11 +27,11 @@ function Transaction() {
   const handleExportCSV = () => {
     console.log(transactions);
     
-    exportCSV({ mode: "dashboard", summary, transactions });
+    exportCSV({ mode: "transactions", summary, transactions });
   };
 
   const handleExportPDF = () => {
-    exportPDF({ mode: "dashboard", summary, transactions });
+    exportPDF({ mode: "transactions", summary, transactions });
   };
 
   return (
