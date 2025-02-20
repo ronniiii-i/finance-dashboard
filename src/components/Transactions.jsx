@@ -12,7 +12,7 @@ import { useTransactions } from "../context/TransactionsContext";
 import "../styles/transactions.scss";
 
 function Transactions({
-  transactions,
+  // transactions,
   page,
   indexOfFirstTransaction,
   indexOfLastTransaction,
@@ -26,11 +26,13 @@ function Transactions({
   const {
     supabaseUrl,
     supabaseApiKey,
+    filteredTransactions,
+    filterTransactions,
     fetchTransactions,
   } = useTransactions();
   const [showFilter, setShowFilter] = useState(false);
-  const [filteredTransactions, setFilteredTransactions] =
-    useState(transactions);
+  // const [filteredTransactions, setFilteredTransactions] =
+  // useState(transactions);
   const [recentTransactions, setRecentTransactions] = useState([]);
 
   const formatDate = (dateString) => {
@@ -42,22 +44,22 @@ function Transactions({
     setShowFilter(!showFilter); // Toggle the state
   };
 
-  const filterTransactions = (type) => {
-    if (type === "all") {
-      setFilteredTransactions(transactions); // Reset to all transactions
-    } else {
-      const filtered = transactions.filter(
-        (transaction) => transaction.type === type
-      );
-      setFilteredTransactions(filtered); // Filter by type
-    }
-    setShowFilter(false); // Close the filter dropdown
-  };
+  // const filterTransactions = (type) => {
+  //   if (type === "all") {
+  //     setFilteredTransactions(transactions); // Reset to all transactions
+  //   } else {
+  //     const filtered = transactions.filter(
+  //       (transaction) => transaction.type === type
+  //     );
+  //     setFilteredTransactions(filtered); // Filter by type
+  //   }
+  //   setShowFilter(false); // Close the filter dropdown
+  // };
 
-  const resetFilter = () => {
-    setFilteredTransactions(transactions); // Reset to all transactions
-    setShowFilter(false); // Close the filter dropdown
-  };
+  // const resetFilter = () => {
+  //   setFilteredTransactions(transactions); // Reset to all transactions
+  //   setShowFilter(false); // Close the filter dropdown
+  // };
 
   const handleDelete = async (id) => {
     try {
@@ -83,10 +85,7 @@ function Transactions({
         icon: "success",
       });
 
-      // Refresh transactions list (assuming you have a way to refetch transactions)
-      if (fetchTransactions) {
-        fetchTransactions();
-      }
+      fetchTransactions();
     } catch (error) {
       console.error("Error:", error);
       Swal.fire({
@@ -99,9 +98,9 @@ function Transactions({
 
   useEffect(() => {
     if (page === "dashboard") {
-      setRecentTransactions(filteredTransactions.slice(0, 30)); // Show only the first 30 transactions for the dashboard
+      setRecentTransactions(filteredTransactions.slice(0, 30));
     } else {
-      setRecentTransactions(filteredTransactions); // Show all transactions for the transactions page
+      setRecentTransactions(filteredTransactions);
     }
   }, [page, filteredTransactions]);
 
@@ -124,9 +123,32 @@ function Transactions({
             Filter <IoFilterOutline />
           </li>
           <div className={showFilter ? "show" : ""}>
-            <li onClick={() => filterTransactions("income")}>Income</li>
-            <li onClick={() => filterTransactions("expense")}>Expense</li>
-            <li onClick={resetFilter}>All</li> {/* Reset filter */}
+            <li
+              onClick={() => {
+                filterTransactions("income");
+                toggleFilter();
+              }}
+            >
+              Income
+            </li>
+            <li
+              onClick={() => {
+                filterTransactions("expense");
+                toggleFilter();
+              }}
+            >
+              Expense
+            </li>
+            <li
+              onClick={() => {
+                filterTransactions("all");
+                toggleFilter();
+              }}
+            >
+              All
+            </li>{" "}
+            {/* Reset filter */}
+            {/* <li onClick={resetFilter}>All</li> Reset filter */}
           </div>
         </ul>
       </div>

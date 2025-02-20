@@ -39,7 +39,7 @@ function Dashboard() {
 
   const indexOfLastTransaction = currentPage * transactionsPerPage;
   const indexOfFirstTransaction = indexOfLastTransaction - transactionsPerPage;
-  const currentTransactions = recentTransactions;
+  // const currentTransactions = recentTransactions;
 
   // Function to calculate the total income for a given month
   const calculateMonthlyIncome = (month) => {
@@ -116,7 +116,10 @@ function Dashboard() {
           </button>
           <button
             className="flex align-center justify-center secondary"
-            onClick={() => {setPopup(true); setPopupMode("add")}}
+            onClick={() => {
+              setPopup(true);
+              setPopupMode("add");
+            }}
           >
             <IoMdAdd /> Add Entry
           </button>
@@ -226,12 +229,12 @@ function Dashboard() {
           </div>
           <div className="recent">
             <Transactions
-              transactions={currentTransactions}
+              transactions={transactions}
               page="dashboard"
               setCurrentPage={setCurrentPage}
               indexOfFirstTransaction={indexOfFirstTransaction}
               indexOfLastTransaction={indexOfLastTransaction}
-              recentTransactions={recentTransactions}
+              // recentTransactions={recentTransactions}
               currentPage={currentPage}
               transactionsPerPage={transactionsPerPage}
             />

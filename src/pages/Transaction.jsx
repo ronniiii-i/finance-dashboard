@@ -12,7 +12,7 @@ import { exportCSV } from "../utils/exportCSV";
 import { exportPDF } from "../utils/exportPDF";
 
 function Transaction() {
-  const { transactions,recentTransactions, summary } = useTransactions();
+  const { transactions, summary } = useTransactions();
   const [popup, setPopup] = useState(false);
   const [popupMode, setPopupMode] = useState("");
   const [selectedTransactionId, setSelectedTransactionId] = useState(null);
@@ -25,6 +25,8 @@ function Transaction() {
   const indexOfFirstTransaction = indexOfLastTransaction - transactionsPerPage;
 
   const handleExportCSV = () => {
+    console.log(transactions);
+    
     exportCSV({ mode: "dashboard", summary, transactions });
   };
 
@@ -79,7 +81,7 @@ function Transaction() {
           setCurrentPage={setCurrentPage}
           indexOfFirstTransaction={indexOfFirstTransaction}
           indexOfLastTransaction={indexOfLastTransaction}
-          recentTransactions={recentTransactions}
+          // recentTransactions={recentTransactions}
           currentPage={currentPage}
           transactionsPerPage={transactionsPerPage}
           setPopup={setPopup}

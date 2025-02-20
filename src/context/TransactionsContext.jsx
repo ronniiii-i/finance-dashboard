@@ -68,7 +68,7 @@ export const TransactionsProvider = ({
     const data = await res.json();
     const sortedData = data.sort((a, b) => new Date(b.date) - new Date(a.date));
     setTransactions(sortedData);
-    setFilteredTransactions(sortedData);
+    setFilteredTransactions(sortedData); // Ensure filteredTransactions is updated
     setrecentTransactions(sortedData.slice(0, 30));
   }, [supabaseUrl, supabaseApiKey]);
 
@@ -92,13 +92,23 @@ export const TransactionsProvider = ({
     fetchCategories();
   }, [supabaseUrl, supabaseApiKey]);
 
-  const filterTransactions = (type) => {
-    const filtered = transactions.filter(
-      (transaction) => transaction.type === type
-    );
-    setFilteredTransactions(filtered);
-  };
+  // const filterTransactions = (type) => {
+  //   const filtered = transactions.filter(
+  //     (transaction) => transaction.type === type
+  //   );
+  //   setFilteredTransactions(filtered);
+  // };
 
+  const filterTransactions = (type) => {
+    if (type === "all") {
+      setFilteredTransactions(transactions); // Reset to all transactions
+    } else {
+      const filtered = transactions.filter(
+        (transaction) => transaction.type === type
+      );
+      setFilteredTransactions(filtered); // Filter by type
+    }
+  };
   const calculateSummary = useCallback(() => {
     const income = transactions
       .filter((t) => t.type === "income")
