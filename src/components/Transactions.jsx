@@ -4,6 +4,9 @@ import {
   IoChevronForwardOutline,
   IoChevronBackOutline,
 } from "react-icons/io5";
+import { BiEditAlt } from "react-icons/bi";
+import { MdDelete } from "react-icons/md";
+
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
 
@@ -179,16 +182,20 @@ function Transactions({
                 {page != "dashboard" && (
                   <td className="flex">
                     <button
+                      className="icon"
                       onClick={() => {
                         setSelectedTransactionId(transaction.id);
                         setPopup(true);
                         setPopupMode("edit");
                       }}
                     >
-                      Edit
+                      <BiEditAlt />
                     </button>
-                    <button onClick={() => handleDelete(transaction.id)}>
-                      Delete
+                    <button
+                      className="icon delete"
+                      onClick={() => handleDelete(transaction.id)}
+                    >
+                      <MdDelete />
                     </button>
                   </td>
                 )}
