@@ -25,8 +25,6 @@ function Transaction() {
   const indexOfFirstTransaction = indexOfLastTransaction - transactionsPerPage;
 
   const handleExportCSV = () => {
-    console.log(transactions);
-    
     exportCSV({ mode: "transactions", summary, transactions });
   };
 
