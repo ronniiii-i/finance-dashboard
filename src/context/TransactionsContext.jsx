@@ -29,16 +29,13 @@ export const TransactionsProvider = ({
 
   const fetchUser = async () => {
     try {
-      const res = await fetch(
-        `${supabaseUrl}/rest/v1/names?select=*`, // Replace 'users' with your table name
-        {
-          headers: {
-            apikey: supabaseApiKey, // Replace with your Supabase API key
-            Authorization: `Bearer ${supabaseApiKey}`, // Replace with your Supabase API key
-            "Content-Type": "application/json",
-          },
-        }
-      );
+      const res = await fetch(`${supabaseUrl}/rest/v1/names?select=*`, {
+        headers: {
+          apikey: supabaseApiKey,
+          Authorization: `Bearer ${supabaseApiKey}`,
+          "Content-Type": "application/json",
+        },
+      });
 
       if (!res.ok) {
         throw new Error(`Failed to fetch user: ${res.statusText}`);
@@ -46,12 +43,12 @@ export const TransactionsProvider = ({
 
       const data = await res.json();
 
-      // Assuming the response is an array of users and you want the first user
       if (data.length > 0) {
-        setUser(data[0]); // Set the first user in the array
+        setUser(data[0]); 
       } else {
         console.error("No user found");
       }
+      
     } catch (error) {
       console.error("Error fetching user:", error);
     }
@@ -90,6 +87,7 @@ export const TransactionsProvider = ({
 
   useEffect(() => {
     fetchCategories();
+    fetchUser();
   }, [supabaseUrl, supabaseApiKey]);
 
   // const filterTransactions = (type) => {
