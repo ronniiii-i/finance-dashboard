@@ -12,6 +12,8 @@ import Swal from "sweetalert2";
 
 import { useTransactions } from "../context/TransactionsContext";
 
+import Filter from "./Filter";
+
 import "../styles/transactions.scss";
 
 function Transactions({
@@ -34,9 +36,8 @@ function Transactions({
     fetchTransactions,
   } = useTransactions();
   const [showFilter, setShowFilter] = useState(false);
-  // const [filteredTransactions, setFilteredTransactions] =
-  // useState(transactions);
   const [recentTransactions, setRecentTransactions] = useState([]);
+  // const [show, setShow] = useState(true);
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -44,25 +45,8 @@ function Transactions({
   };
 
   const toggleFilter = () => {
-    setShowFilter(!showFilter); // Toggle the state
+    setShowFilter(!showFilter);
   };
-
-  // const filterTransactions = (type) => {
-  //   if (type === "all") {
-  //     setFilteredTransactions(transactions); // Reset to all transactions
-  //   } else {
-  //     const filtered = transactions.filter(
-  //       (transaction) => transaction.type === type
-  //     );
-  //     setFilteredTransactions(filtered); // Filter by type
-  //   }
-  //   setShowFilter(false); // Close the filter dropdown
-  // };
-
-  // const resetFilter = () => {
-  //   setFilteredTransactions(transactions); // Reset to all transactions
-  //   setShowFilter(false); // Close the filter dropdown
-  // };
 
   const handleDelete = async (id) => {
     try {
@@ -115,119 +99,129 @@ function Transactions({
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   return (
-    <div className="transactions">
-      <div className="top flex align-center justify-between">
-        <h4>{page ? `Recent` : "Your"} Transactions</h4>
-        <ul className={`filter ${showFilter ? "" : "overflow-hidden"}`}>
-          <li
-            onClick={toggleFilter}
-            className="flex align-center justify-between"
-          >
-            Filter <IoFilterOutline />
-          </li>
-          <div className={showFilter ? "show" : ""}>
+    <>
+      <div className="transactions">
+        <div className="top flex align-center justify-between">
+          <h4>{page ? `Recent` : "Your"} Transactions</h4>
+
+          <ul className={`filter ${showFilter ? "" : "overflow-hidden"}`}>
             <li
-              onClick={() => {
-                filterTransactions("income");
-                toggleFilter();
-              }}
+              onClick={toggleFilter}
+              className="flex align-center justify-between"
             >
-              Income
+              Filter <IoFilterOutline />
             </li>
-            <li
-              onClick={() => {
-                filterTransactions("expense");
-                toggleFilter();
-              }}
-            >
-              Expense
-            </li>
-            <li
-              onClick={() => {
-                filterTransactions("all");
-                toggleFilter();
-              }}
-            >
-              All
-            </li>{" "}
-            {/* Reset filter */}
-            {/* <li onClick={resetFilter}>All</li> Reset filter */}
-          </div>
-        </ul>
-      </div>
-      <table className="full-width">
-        <thead>
-          <tr>
-            <th>Description</th>
-            <th>Type</th>
-            <th>Category</th>
-            <th>Amount</th>
-            <th>Date</th>
-            {page != "dashboard" && <th>Actions</th>}
-          </tr>
-        </thead>
-        <tbody>
-          {currentTransactions.map((transaction) => {
-            const formattedDate = formatDate(transaction.date);
-            return (
-              <tr key={transaction.id}>
-                <td>{transaction.note}</td>
-                <td>
-                  {transaction.type.charAt(0).toUpperCase() +
-                    transaction.type.slice(1)}
-                </td>
-                <td>{transaction.category}</td>
-                <td>£{transaction.amount}</td>
-                <td>{formattedDate}</td>
-                {page != "dashboard" && (
-                  <td className="flex">
-                    <button
-                      className="icon"
-                      onClick={() => {
-                        setSelectedTransactionId(transaction.id);
-                        setPopup(true);
-                        setPopupMode("edit");
-                      }}
-                    >
-                      <BiEditAlt />
-                    </button>
-                    <button
-                      className="icon delete"
-                      onClick={() => handleDelete(transaction.id)}
-                    >
-                      <MdDelete />
-                    </button>
+            {page && (
+              <div className={showFilter ? "show" : ""}>
+                <li
+                  onClick={() => {
+                    filterTransactions("income");
+                    toggleFilter();
+                  }}
+                >
+                  Income
+                </li>
+                <li
+                  onClick={() => {
+                    filterTransactions("expense");
+                    toggleFilter();
+                  }}
+                >
+                  Expense
+                </li>
+                <li
+                  onClick={() => {
+                    filterTransactions("all");
+                    toggleFilter();
+                  }}
+                >
+                  All
+                </li>
+              </div>
+            )}
+          </ul>
+        </div>
+        <table className="full-width">
+          <thead>
+            <tr>
+              <th>Description</th>
+              <th>Type</th>
+              <th>Category</th>
+              <th>Amount</th>
+              <th>Date</th>
+              {page != "dashboard" && <th>Actions</th>}
+            </tr>
+          </thead>
+          <tbody>
+            {currentTransactions.map((transaction) => {
+              const formattedDate = formatDate(transaction.date);
+              return (
+                <tr key={transaction.id}>
+                  <td>{transaction.note}</td>
+                  <td>
+                    {transaction.type.charAt(0).toUpperCase() +
+                      transaction.type.slice(1)}
                   </td>
-                )}
-              </tr>
-            );
-          })}
-        </tbody>
-      </table>
-      <div className="pagination flex justify-between align-center">
-        <p>
-          Showing {indexOfFirstTransaction + 1} to {indexOfLastTransaction} of{" "}
-          {recentTransactions.length} results
-        </p>
-        <div className="buttons flex align-center">
-          <button
-            onClick={() => paginate(currentPage - 1)}
-            disabled={currentPage === 1}
-          >
-            <IoChevronBackOutline />
-          </button>
-          <button
-            onClick={() => paginate(currentPage + 1)}
-            disabled={
-              currentPage ===
-              Math.ceil(recentTransactions.length / transactionsPerPage)
-            }
-          >
-            <IoChevronForwardOutline />
-          </button>
+                  <td>{transaction.category}</td>
+                  <td>£{transaction.amount}</td>
+                  <td>{formattedDate}</td>
+                  {page != "dashboard" && (
+                    <td className="flex">
+                      <button
+                        className="icon"
+                        onClick={() => {
+                          setSelectedTransactionId(transaction.id);
+                          setPopup(true);
+                          setPopupMode("edit");
+                        }}
+                      >
+                        <BiEditAlt />
+                      </button>
+                      <button
+                        className="icon delete"
+                        onClick={() => handleDelete(transaction.id)}
+                      >
+                        <MdDelete />
+                      </button>
+                    </td>
+                  )}
+                </tr>
+              );
+            })}
+          </tbody>
+        </table>
+        <div className="pagination flex justify-between align-center">
+          <p>
+            Showing {indexOfFirstTransaction + 1} to {indexOfLastTransaction} of{" "}
+            {recentTransactions.length} results
+          </p>
+          <div className="buttons flex align-center">
+            <button
+              onClick={() => paginate(currentPage - 1)}
+              disabled={currentPage === 1}
+            >
+              <IoChevronBackOutline />
+            </button>
+            <button
+              onClick={() => paginate(currentPage + 1)}
+              disabled={
+                currentPage ===
+                Math.ceil(recentTransactions.length / transactionsPerPage)
+              }
+            >
+              <IoChevronForwardOutline />
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+      {!page && (
+        <Filter
+          show={showFilter}
+          onClose={toggleFilter}
+          // filterTransactions={filterTransactions}
+        />
+      )}
+    </>
   );
 }
 
