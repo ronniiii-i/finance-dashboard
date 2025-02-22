@@ -104,6 +104,14 @@ function Transactions({
         <div className="top flex align-center justify-between">
           <h4>{page ? `Recent` : "Your"} Transactions</h4>
 
+          {!page && (
+            <Filter
+              show={showFilter}
+              onClose={toggleFilter}
+              // filterTransactions={filterTransactions}
+            />
+          )}
+
           <ul className={`filter ${showFilter ? "" : "overflow-hidden"}`}>
             <li
               onClick={toggleFilter}
@@ -214,13 +222,6 @@ function Transactions({
           </div>
         </div>
       </div>
-      {!page && (
-        <Filter
-          show={showFilter}
-          onClose={toggleFilter}
-          // filterTransactions={filterTransactions}
-        />
-      )}
     </>
   );
 }

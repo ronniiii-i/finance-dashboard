@@ -4,7 +4,7 @@ import { IoFilterOutline } from "react-icons/io5";
 import { FaSortDown } from "react-icons/fa6";
 import { MdClose } from "react-icons/md";
 import Slider from "rc-slider";
-import "rc-slider/assets/index.css"; // Import the default styles
+import "rc-slider/assets/index.css";
 import "../styles/filter.scss";
 
 const Filter = ({ show, onClose }) => {
@@ -15,8 +15,8 @@ const Filter = ({ show, onClose }) => {
     endTime: "",
     type: "",
     selectedCategories: [],
-    minAmount: 50, // Default min amount
-    maxAmount: 1000, // Default max amount
+    minAmount: 50,
+    maxAmount: 1000,
   });
 
   const [dropdownVisibility, setDropdownVisibility] = useState({
@@ -67,7 +67,7 @@ const Filter = ({ show, onClose }) => {
   };
 
   return (
-    <div className={`filter-sidebar flex ${show ? "active" : "hidden"}`}>
+    <div className={`filter-row flex ${show ? "active" : "hidden"}`}>
       <div className="flex align-center justify-between">
         <h3 className="flex align-center">
           <IoFilterOutline />
@@ -257,8 +257,8 @@ const Filter = ({ show, onClose }) => {
             endTime: "",
             type: "",
             selectedCategories: [],
-            minAmount: 50, // Default min amount
-            maxAmount: 1000, // Default max amount
+            minAmount: 50,
+            maxAmount: 1000,
           })
         }
       >
