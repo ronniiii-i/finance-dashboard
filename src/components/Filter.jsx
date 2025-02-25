@@ -81,7 +81,7 @@ const Filter = ({ show, onClose }) => {
   };
 
   return (
-    <div className={`filter-container ${show ? "active" : "hide"}`}>
+    <div className={`transaction-filter-container ${show ? "active" : "hide"}`}>
       {/* Header with close button */}
       <div className="filter-header">
         <h3>Filters</h3>
@@ -179,7 +179,7 @@ const Filter = ({ show, onClose }) => {
           Apply
         </button>
       </div>
-    </div>  
+    </div>
   );
 };
 
