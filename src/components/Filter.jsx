@@ -1,8 +1,6 @@
 /* eslint-disable react/prop-types */
 import { useState } from "react";
-import { IoFilterOutline } from "react-icons/io5";
-import { FaSortDown } from "react-icons/fa6";
-import { MdClose } from "react-icons/md";
+import { FaTimes } from "react-icons/fa";
 import Slider from "rc-slider";
 import "rc-slider/assets/index.css";
 import "../styles/filter.scss";
@@ -19,13 +17,52 @@ const Filter = ({ show, onClose }) => {
     maxAmount: 1000,
   });
 
-  const [dropdownVisibility, setDropdownVisibility] = useState({
-    date: false,
-    time: false,
-    type: false,
-    category: false,
-    amount: false,
-  });
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFilters((prevFilters) => ({
+      ...prevFilters,
+      [name]: value,
+    }));
+  };
+
+  const handleCategoryChange = (e) => {
+    const { value, checked } = e.target;
+
+    setFilters((prevFilters) => {
+      let updatedCategories;
+      if (checked) {
+        updatedCategories = [...prevFilters.selectedCategories, value];
+      } else {
+        updatedCategories = prevFilters.selectedCategories.filter(
+          (category) => category !== value
+        );
+      }
+
+      return {
+        ...prevFilters,
+        selectedCategories: updatedCategories,
+      };
+    });
+  };
+
+  const handleReset = () => {
+    setFilters({
+      startDate: "",
+      endDate: "",
+      startTime: "",
+      endTime: "",
+      type: "",
+      selectedCategories: [],
+      minAmount: 50,
+      maxAmount: 1000,
+    });
+  };
+
+  const handleApply = () => {
+    // TO DO: implement the logic to apply the filters
+    console.log("Applied Filters:", filters);
+    onClose();
+  };
 
   const minTransactionAmount = 50;
   const maxTransactionAmount = 1000;
@@ -33,13 +70,7 @@ const Filter = ({ show, onClose }) => {
   const types = ["Income", "Expense", "Investment"];
   const categories = ["Food", "Travel", "Shopping", "Health", "Education"];
 
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setFilters({
-      ...filters,
-      [name]: value,
-    });
-  };
+  
 
   const handleSliderChange = (value) => {
     setFilters({
@@ -49,222 +80,106 @@ const Filter = ({ show, onClose }) => {
     });
   };
 
-  const handleCategoryChange = (e) => {
-    const { value, checked } = e.target;
-    setFilters((prevState) => {
-      const selectedCategories = checked
-        ? [...prevState.selectedCategories, value]
-        : prevState.selectedCategories.filter((category) => category !== value);
-      return { ...prevState, selectedCategories };
-    });
-  };
-
-  const toggleDropdown = (section) => {
-    setDropdownVisibility((prevState) => ({
-      ...prevState,
-      [section]: !prevState[section],
-    }));
-  };
-
   return (
-    <div className={`filter-row flex ${show ? "active" : "hidden"}`}>
-      <div className="flex align-center justify-between">
-        <h3 className="flex align-center">
-          <IoFilterOutline />
-          Filter
-        </h3>
-        <MdClose onClick={() => onClose()} />
+    <div className={`filter-container ${show ? "active" : "hide"}`}>
+      {/* Header with close button */}
+      <div className="filter-header">
+        <h3>Filters</h3>
+        <span className="close-btn" onClick={onClose}>
+          <FaTimes />
+        </span>
       </div>
 
-      <div className="filter-content">
+      {/* Filter sections */}
+      <div className="filter-sections">
+        {/* Date and Time Filter */}
         <div className="filter-section">
-          <div
-            className="title flex justify-between"
-            onClick={() => toggleDropdown("date")}
-          >
-            <h6 className="flex align-center">Date</h6>
-            <FaSortDown className={dropdownVisibility.date ? "rotate" : ""} />
-          </div>
-          <div
-            className={`filter-dropdown ${
-              dropdownVisibility.date ? "open" : ""
-            }`}
-          >
-            <div className="dropdown-item flex align-center justify-between">
-              <label>Start Date:</label>
-              <input
-                type="date"
-                name="startDate"
-                value={filters.startDate}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="dropdown-item flex align-center justify-between">
-              <label>End Date:</label>
-              <input
-                type="date"
-                name="endDate"
-                value={filters.endDate}
-                onChange={handleChange}
-              />
-            </div>
+          <label>Date & Time</label>
+          <div className="date-time-filters">
+            <input type="date" name="startDate" onChange={handleChange} />
+            <input type="date" name="endDate" onChange={handleChange} />
+            <input type="time" name="startTime" onChange={handleChange} />
+            <input type="time" name="endTime" onChange={handleChange} />
           </div>
         </div>
 
+        {/* Type Filter */}
         <div className="filter-section">
-          <div
-            className="title flex justify-between"
-            onClick={() => toggleDropdown("time")}
-          >
-            <h6 className="flex align-center">Time</h6>
-            <FaSortDown className={dropdownVisibility.time ? "rotate" : ""} />
-          </div>
-          <div
-            className={`filter-dropdown ${
-              dropdownVisibility.time ? "open" : ""
-            }`}
-          >
-            <div className="dropdown-item flex align-center justify-between">
-              <label>Start Time:</label>
-              <input
-                type="time"
-                name="startTime"
-                value={filters.startTime}
-                onChange={handleChange}
-              />
-            </div>
-            <div className="dropdown-item flex align-center justify-between">
-              <label>End Time:</label>
-              <input
-                type="time"
-                name="endTime"
-                value={filters.endTime}
-                onChange={handleChange}
-              />
-            </div>
-          </div>
-        </div>
-
-        <div className="filter-section">
-          <div
-            className="title flex justify-between"
-            onClick={() => toggleDropdown("type")}
-          >
-            <h6>Type</h6>
-            <FaSortDown className={dropdownVisibility.type ? "rotate" : ""} />
-          </div>
-          <div
-            className={`filter-dropdown ${
-              dropdownVisibility.type ? "open" : ""
-            }`}
-          >
+          <label>Type</label>
+          <select name="type" value={filters.type} onChange={handleChange}>
+            <option value="">All</option>
             {types.map((type) => (
-              <div className="dropdown-item flex align-center" key={type}>
-                <input
-                  type="radio"
-                  name="type"
-                  value={type}
-                  checked={filters.type === type}
-                  onChange={handleChange}
-                />
-                <label>{type}</label>
-              </div>
+              <option value={type} key={type}>
+                {type}
+              </option>
             ))}
-          </div>
+          </select>
         </div>
 
+        {/* Category Filter (Checklist) */}
         <div className="filter-section">
-          <div
-            className="title flex justify-between"
-            onClick={() => toggleDropdown("category")}
-          >
-            <h6>Category</h6>
-            <FaSortDown
-              className={dropdownVisibility.category ? "rotate" : ""}
-            />
-          </div>
-          <div
-            className={`filter-dropdown ${
-              dropdownVisibility.category ? "open" : ""
-            }`}
-          >
+          <label>Category</label>
+          <div className="category-checklist">
             {categories.map((category) => (
-              <div className="dropdown-item flex align-center" key={category}>
+              <label key={category} className="checkbox-label">
                 <input
                   type="checkbox"
-                  name="category"
+                  name="selectedCategories"
                   value={category}
                   checked={filters.selectedCategories.includes(category)}
                   onChange={handleCategoryChange}
                 />
-                <label>{category}</label>
-              </div>
+                {category}
+              </label>
             ))}
           </div>
         </div>
 
+        {/* Amount Filter */}
         <div className="filter-section">
-          <div
-            className="title flex justify-between"
-            onClick={() => toggleDropdown("amount")}
-          >
-            <h6>Amount</h6>
-            <FaSortDown className={dropdownVisibility.amount ? "rotate" : ""} />
-          </div>
-          <div
-            className={`filter-dropdown ${
-              dropdownVisibility.amount ? "open" : ""
-            }`}
-          >
-            <div className="dropdown-item">
-              <Slider
-                range
+          <label>Amount Range</label>
+          <div className="amount-range">
+            <Slider
+              range
+              min={minTransactionAmount}
+              max={maxTransactionAmount}
+              value={[filters.minAmount, filters.maxAmount]}
+              onChange={handleSliderChange}
+            />
+            <div className="amount-inputs">
+              <input
+                type="number"
+                name="minAmount"
+                value={filters.minAmount}
+                onChange={handleChange}
                 min={minTransactionAmount}
                 max={maxTransactionAmount}
-                value={[filters.minAmount, filters.maxAmount]}
-                onChange={handleSliderChange}
+                placeholder="Min"
               />
-              <div className="flex justify-between">
-                <input
-                  type="number"
-                  name="minAmount"
-                  value={filters.minAmount}
-                  onChange={handleChange}
-                  min={minTransactionAmount}
-                  max={maxTransactionAmount}
-                />
-                <input
-                  type="number"
-                  name="maxAmount"
-                  value={filters.maxAmount}
-                  onChange={handleChange}
-                  min={minTransactionAmount}
-                  max={maxTransactionAmount}
-                />
-              </div>
+              <input
+                type="number"
+                name="maxAmount"
+                value={filters.maxAmount}
+                onChange={handleChange}
+                min={minTransactionAmount}
+                max={maxTransactionAmount}
+                placeholder="Max"
+              />
             </div>
           </div>
         </div>
       </div>
 
-      <button
-        className="reset-btn"
-        onClick={() =>
-          setFilters({
-            startDate: "",
-            endDate: "",
-            startTime: "",
-            endTime: "",
-            type: "",
-            selectedCategories: [],
-            minAmount: 50,
-            maxAmount: 1000,
-          })
-        }
-      >
-        Reset
-      </button>
-    </div>
+      {/* Reset and Apply Buttons */}
+      <div className="filter-actions">
+        <button className="reset-btn" onClick={handleReset}>
+          Reset
+        </button>
+        <button className="apply-btn" onClick={handleApply}>
+          Apply
+        </button>
+      </div>
+    </div>  
   );
 };
 
