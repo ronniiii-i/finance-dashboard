@@ -5,7 +5,7 @@ import Slider from "rc-slider";
 import "rc-slider/assets/index.css";
 import "../styles/filter.scss";
 
-const Filter = ({ show, onClose }) => {
+const Filter = ({ show, onClose, onApply }) => {
   const [filters, setFilters] = useState({
     startDate: "",
     endDate: "",
@@ -59,8 +59,7 @@ const Filter = ({ show, onClose }) => {
   };
 
   const handleApply = () => {
-    // TO DO: implement the logic to apply the filters
-    console.log("Applied Filters:", filters);
+    onApply(filters); // Pass the filters to the parent component
     onClose();
   };
 
@@ -69,8 +68,6 @@ const Filter = ({ show, onClose }) => {
 
   const types = ["Income", "Expense", "Investment"];
   const categories = ["Food", "Travel", "Shopping", "Health", "Education"];
-
-  
 
   const handleSliderChange = (value) => {
     setFilters({

@@ -76,6 +76,7 @@ function Transaction() {
       <div>
         <Transactions
           transactions={transactions}
+          page={null}
           setCurrentPage={setCurrentPage}
           indexOfFirstTransaction={indexOfFirstTransaction}
           indexOfLastTransaction={indexOfLastTransaction}

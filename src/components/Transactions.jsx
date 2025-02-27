@@ -6,18 +6,13 @@ import {
 } from "react-icons/io5";
 import { BiEditAlt } from "react-icons/bi";
 import { MdDelete } from "react-icons/md";
-
 import { useEffect, useState } from "react";
 import Swal from "sweetalert2";
-
 import { useTransactions } from "../context/TransactionsContext";
-
 import Filter from "./Filter";
-
 import "../styles/transactions.scss";
 
 function Transactions({
-  // transactions,
   page,
   indexOfFirstTransaction,
   indexOfLastTransaction,
@@ -31,13 +26,30 @@ function Transactions({
   const {
     supabaseUrl,
     supabaseApiKey,
-    filteredTransactions,
-    filterTransactions,
+    recentTransactions,
+    setRecentTransactions,
+    dashboardFilteredTransactions,
+    transactionsPageFilteredTransactions,
+    filterDashboardTransactions,
+    filterTransactionsPage,
     fetchTransactions,
   } = useTransactions();
+
   const [showFilter, setShowFilter] = useState(false);
-  const [recentTransactions, setRecentTransactions] = useState([]);
-  // const [show, setShow] = useState(true);
+
+  // Use the correct filtered transactions based on the page
+  const filteredTransactions =
+    page === "dashboard"
+      ? dashboardFilteredTransactions
+      : transactionsPageFilteredTransactions;
+
+  const handleApplyFilters = (filters) => {
+    if (page === "dashboard") {
+      filterDashboardTransactions(filters.type); // Example: Filter by type for dashboard
+    } else {
+      filterTransactionsPage(filters); // Apply full filter logic for transactions page
+    }
+  };
 
   const formatDate = (dateString) => {
     const date = new Date(dateString);
@@ -108,7 +120,7 @@ function Transactions({
             <Filter
               show={showFilter}
               onClose={toggleFilter}
-              // filterTransactions={filterTransactions}
+              onApply={handleApplyFilters} // Pass the apply filters function
             />
           )}
 
@@ -123,7 +135,7 @@ function Transactions({
               <div className={showFilter ? "show" : ""}>
                 <li
                   onClick={() => {
-                    filterTransactions("income");
+                    filterDashboardTransactions("income");
                     toggleFilter();
                   }}
                 >
@@ -131,7 +143,7 @@ function Transactions({
                 </li>
                 <li
                   onClick={() => {
-                    filterTransactions("expense");
+                    filterDashboardTransactions("expense");
                     toggleFilter();
                   }}
                 >
@@ -139,7 +151,7 @@ function Transactions({
                 </li>
                 <li
                   onClick={() => {
-                    filterTransactions("all");
+                    filterDashboardTransactions("all");
                     toggleFilter();
                   }}
                 >

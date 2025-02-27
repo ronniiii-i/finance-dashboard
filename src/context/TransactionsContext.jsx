@@ -17,8 +17,13 @@ export const TransactionsProvider = ({
 }) => {
   const [user, setUser] = useState([]);
   const [transactions, setTransactions] = useState([]);
-  const [filteredTransactions, setFilteredTransactions] = useState([]);
-  const [recentTransactions, setrecentTransactions] = useState([]);
+  const [dashboardFilteredTransactions, setDashboardFilteredTransactions] =
+    useState([]);
+  const [
+    transactionsPageFilteredTransactions,
+    setTransactionsPageFilteredTransactions,
+  ] = useState([]);
+  const [recentTransactions, setRecentTransactions] = useState([]);
   const [categories, setCategories] = useState([]);
   const [summary, setSummary] = useState({
     income: 0,
@@ -44,11 +49,10 @@ export const TransactionsProvider = ({
       const data = await res.json();
 
       if (data.length > 0) {
-        setUser(data[0]); 
+        setUser(data[0]);
       } else {
         console.error("No user found");
       }
-      
     } catch (error) {
       console.error("Error fetching user:", error);
     }
@@ -65,8 +69,9 @@ export const TransactionsProvider = ({
     const data = await res.json();
     const sortedData = data.sort((a, b) => new Date(b.date) - new Date(a.date));
     setTransactions(sortedData);
-    setFilteredTransactions(sortedData); // Ensure filteredTransactions is updated
-    setrecentTransactions(sortedData.slice(0, 30));
+    setDashboardFilteredTransactions(sortedData); // Initialize dashboard filter
+    setTransactionsPageFilteredTransactions(sortedData); // Initialize transactions page filter
+    setRecentTransactions(sortedData.slice(0, 30));
   }, [supabaseUrl, supabaseApiKey]);
 
   useEffect(() => {
@@ -90,23 +95,37 @@ export const TransactionsProvider = ({
     fetchUser();
   }, [supabaseUrl, supabaseApiKey]);
 
-  // const filterTransactions = (type) => {
-  //   const filtered = transactions.filter(
-  //     (transaction) => transaction.type === type
-  //   );
-  //   setFilteredTransactions(filtered);
-  // };
-
-  const filterTransactions = (type) => {
+  // Filter logic for the Dashboard
+  const filterDashboardTransactions = (type) => {
     if (type === "all") {
-      setFilteredTransactions(transactions); // Reset to all transactions
+      setDashboardFilteredTransactions(transactions);
     } else {
       const filtered = transactions.filter(
         (transaction) => transaction.type === type
       );
-      setFilteredTransactions(filtered); // Filter by type
+      setDashboardFilteredTransactions(filtered);
     }
   };
+
+  // Filter logic for the Transactions page
+  const filterTransactionsPage = (filters) => {
+    const filtered = transactions.filter((transaction) => {
+      // Apply filter logic based on the `filters` object
+      return (
+        (!filters.type || transaction.type === filters.type) &&
+        (!filters.startDate ||
+          new Date(transaction.date) >= new Date(filters.startDate)) &&
+        (!filters.endDate ||
+          new Date(transaction.date) <= new Date(filters.endDate)) &&
+        (!filters.selectedCategories.length ||
+          filters.selectedCategories.includes(transaction.category)) &&
+        transaction.amount >= filters.minAmount &&
+        transaction.amount <= filters.maxAmount
+      );
+    });
+    setTransactionsPageFilteredTransactions(filtered);
+  };
+
   const calculateSummary = useCallback(() => {
     const income = transactions
       .filter((t) => t.type === "income")
@@ -130,24 +149,18 @@ export const TransactionsProvider = ({
     <TransactionsContext.Provider
       value={{
         transactions,
-        filteredTransactions,
+        dashboardFilteredTransactions,
+        transactionsPageFilteredTransactions,
         categories,
         summary,
         recentTransactions,
         user,
         supabaseUrl,
         supabaseApiKey,
-        setCategories,
-        setrecentTransactions,
-        calculateSummary,
-        setSummary,
-        setTransactions,
-        filterTransactions,
+        setRecentTransactions,
+        filterDashboardTransactions,
+        filterTransactionsPage,
         fetchTransactions,
-        fetchCategories,
-        setUser,
-        fetchUser,
-        setFilteredTransactions,
       }}
     >
       {children}
