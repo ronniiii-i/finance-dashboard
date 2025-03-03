@@ -3,6 +3,7 @@ import { useState } from "react";
 import { FaTimes } from "react-icons/fa";
 import Slider from "rc-slider";
 import "rc-slider/assets/index.css";
+import { useTransactions } from "../context/TransactionsContext";
 import "../styles/filter.scss";
 
 const Filter = ({ show, onClose, onApply }) => {
@@ -16,6 +17,7 @@ const Filter = ({ show, onClose, onApply }) => {
     minAmount: 50,
     maxAmount: 1000,
   });
+  const { categories } = useTransactions();
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -66,8 +68,7 @@ const Filter = ({ show, onClose, onApply }) => {
   const minTransactionAmount = 50;
   const maxTransactionAmount = 1000;
 
-  const types = ["Income", "Expense", "Investment"];
-  const categories = ["Food", "Travel", "Shopping", "Health", "Education"];
+  const types = ["income", "expense", "investment"];
 
   const handleSliderChange = (value) => {
     setFilters({
@@ -107,7 +108,7 @@ const Filter = ({ show, onClose, onApply }) => {
             <option value="">All</option>
             {types.map((type) => (
               <option value={type} key={type}>
-                {type}
+                {type.slice(0, 1).toLocaleUpperCase() +  type.slice(1, type.length)}
               </option>
             ))}
           </select>
@@ -118,15 +119,15 @@ const Filter = ({ show, onClose, onApply }) => {
           <label>Category</label>
           <div className="category-checklist">
             {categories.map((category) => (
-              <label key={category} className="checkbox-label">
+              <label key={category.id} className="checkbox-label">
                 <input
                   type="checkbox"
                   name="selectedCategories"
-                  value={category}
-                  checked={filters.selectedCategories.includes(category)}
+                  value={category.name}
+                  checked={filters.selectedCategories.includes(category.name)}
                   onChange={handleCategoryChange}
                 />
-                {category}
+                {category.name}
               </label>
             ))}
           </div>

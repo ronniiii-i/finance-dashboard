@@ -212,8 +212,11 @@ function Transactions({
         </table>
         <div className="pagination flex justify-between align-center">
           <p>
-            Showing {indexOfFirstTransaction + 1} to {indexOfLastTransaction} of{" "}
-            {recentTransactions.length} results
+            Showing {indexOfFirstTransaction + 1} to{" "}
+            {recentTransactions.length <= indexOfFirstTransaction + 1 + 14
+              ? recentTransactions.length
+              : indexOfLastTransaction}{" "}
+            of {recentTransactions.length} results
           </p>
           <div className="buttons flex align-center">
             <button
