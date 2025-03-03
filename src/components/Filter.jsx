@@ -68,7 +68,7 @@ const Filter = ({ show, onClose, onApply }) => {
   const minTransactionAmount = 50;
   const maxTransactionAmount = 1000;
 
-  const types = ["income", "expense", "investment"];
+  const types = ["income", "expense"];
 
   const handleSliderChange = (value) => {
     setFilters({
